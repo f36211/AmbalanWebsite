@@ -80,141 +80,129 @@ export const periods = [
     }
   },
   {
-  year: "2020/2021",
-  image: "/images/Foto/20-21.jpg",
-  putri: {
-    pradana: "Sabila Ramadhania",
-    pemangku: "Nabilah Dinah",
-    kerani: "Fildza Maulida Fairuz",
-    juru: "Tarissa P. M"
+    year: "2020/2021",
+    image: "/images/Foto/20-21.jpg",
+    shalahudin: {
+      pradana: "Zainal Muttaqin",
+      pemangku: "Muhammad Ikhwan Fathin Dzikra",
+      kerani: "Muhammad Ilham Umri",
+      jurang: "Zidan Amirudin",
+      kadivTeknik: "Alif Kurnia Pratama",
+      kadivOperasional: "Akmal Naufal Rabbani",
+      kadivPengmas: "Izzudin Rizqullah",
+      kadivHumas: "Muhammad Albani Kafka L.H."
+    },
+    fatimah: {
+      pradana: "Istiqomatunnisa",
+      pemangku: "Tafida Rizkia Ula",
+      kerani: "Elvanya Nandayu Bunga Satiko",
+      jurang: "Farah Khansa Putri",
+      kadivTeknik: "Deviena Hanna Mutmainnah",
+      kadivOperasional: "Shabrina Rahadatul Aisy",
+      kadivPengmas: "Rezkia Hafidzah",
+      kadivHumas: "Nafhana Silmi"
+    }
   },
-  putra: {
-    pradana: "Adril Ardiansyah",
-    pemangku: "Azfa Nahdi",
-    kerani: "Maulana Sava Muhammad",
-    juru: "M. Yusuf Diko Prasetyo"
+  {
+    year: "2021/2022",
+    image: "/images/Foto/21-22.jpg",
+    shalahudin: {
+      pradana: "Putraku Fawzan A",
+      pemangku: "Liuray Alif",
+      kerani: "Farid Multahadi",
+      jurang: "Althaf Bani Zachari S",
+      kadivTeknik: "Hamka Habibi Hidayatullah",
+      kadivOperasional: "Alaudin Indra Fata",
+      kadivPengmas: "Zaydan Althar Yazid"
+    },
+    fatimah: {
+      pradana: "Amalia Amatullah S",
+      pemangku: "Haniyyah Nafisa",
+      kerani: "Athira Fairuzuma A",
+      jurang: "Ridha Muthiah A",
+      kadivTeknik: "Taqiyya Fakhira N",
+      kadivOperasional: "Alisya Carbelia Anwar",
+      kadivPengmas: "Naura Alifa C.N"
+    }
   },
-  shalahudin: {
-    pradana: "Zainal Muttaqin",
-    pemangku: "Muhammad Ikhwan Fathin Dzikra",
-    kerani: "Muhammad Ilham Umri",
-    jurang: "Zidan Amirudin",
-    kadivTeknik: "Alif Kurnia Pratama",
-    kadivOperasional: "Akmal Naufal Rabbani",
-    kadivPengmas: "Izzudin Rizqullah",
-    kadivHumas: "Muhammad Albani Kafka L.H."
+  {
+    year: "2022/2023",
+    image: "/images/Foto/22-23.jpg",
+    shalahudin: {
+      pradana: "Hamka Habibi Hidayatullah",
+      pemangku: "Ahmad Wafa",
+      kerani: "Muhammad Fatih Badruzzaman",
+      jurang: "Fatih Dhiayul Hilm",
+      kadivTeknik: "Muhamad Gavin Rajwa Quranridho",
+      kadivOperasional: "Naftali Arrayyan",
+      kadivPengmas: "Rasyad Aulia Dhava",
+      kadivHumas: "Aldan Aulia Rafif"
+    },
+    fatimah: {
+      pradana: "Naisa Nuzilla Iska",
+      pemangku: "Nadia Ailsa Diyanti",
+      kerani: "Zahira Salsabila Khairunnisa",
+      jurang: "Hasna Fatiha Jinan",
+      kadivTeknik: "Aqiilah Khairunnisa Azahrah",
+      kadivOperasional: "Salma Hidayaturrobina",
+      kadivPengmas: "Nawra Ghaya Tsabita",
+      kadivHumas: "Isyi Karimah"
+    }
   },
-  fatimah: {
-    pradana: "Istiqomatunnisa",
-    pemangku: "Tafida Rizkia Ula",
-    kerani: "Elvanya Nandayu Bunga Satiko",
-    jurang: "Farah Khansa Putri",
-    kadivTeknik: "Deviena Hanna Mutmainnah",
-    kadivOperasional: "Shabrina Rahadatul Aisy",
-    kadivPengmas: "Rezkia Hafidzah",
-    kadivHumas: "Nafhana Silmi"
+  {
+    year: "2023/2024",
+    image: "/images/Foto/23-24.jpg",
+    shalahudin: {
+      pradana: "Akhmad Syamil Aydin",
+      pemangku: "Haidar Mutawally Halim",
+      kerani: "Ahmad Fawwaz Reswara",
+      jurang: "Muhammad Naufal Firdaus Lazuardi",
+      kadivTeknik: "Lathiful Lisan",
+      kadivPengembangan: "Muhammad Rizki Athalla",
+      kadivPengmas: "Muhammad Athaya Habibi Djawa",
+      kadivHumas: "Ahmad Shofwan Isy Kariman",
+      kadivBisnis: "Salman Zhafran"
+    },
+    fatimah: {
+      pradana: "Amira Amatullah Karimah",
+      pemangku: "Wafiqah Syahla Widad",
+      kerani: "Reihana Fitria Yanuar",
+      jurang: "Kaylila Riani Maidi",
+      kadivTeknik: "Aliya Tazkia Hanum",
+      kadivPengembangan: "Arisa Novia Rosyadah",
+      kadivPengmas: "Nazifa Nur Amalina",
+      kadivHumas: "Yoshiko Ena",
+      kadivBisnis: "Buti Lubna Yurdha"
+    }
+  },
+  {
+    year: "2024/2025",
+    image: "/images/Foto/24-25.jpg",
+    shalahudin: {
+      pradana: "Darma Bachtiar Lubis",
+      pemangku: "Abdullah Yaumul Rahmat",
+      kerani: "Jazid Gumilar",
+      jurang: "Arfan Aqila Ihsan",
+      kadivTeknik: "Mohammad Aldhowi Ilmi Arsyad",
+      kadivPengembangan: "Abian Excel Hidayat",
+      kadivPengmas: "Muhammad Athaya Habibi Djawa",
+      kadivHumas: "Dhafin Zharfan Ghassani",
+      kadivBisnis: "Hanif Putra Abyan"
+    },
+    fatimah: {
+      pradana: "Azkahaura Fadhila Syarwani",
+      pemangku: "Zahira Ratnadhita",
+      kerani: "Alya Mukhbita",
+      jurang: "Aida Maheswari Suryantoro",
+      kadivTeknik: "Raisya Nurjulianti",
+      kadivPengembangan: "Andhiny Putri Salsabila",
+      kadivPengmas: "Maulida Dzikra Hanifah",
+      kadivHumas: "Aulia Azzahra",
+      kadivBisnis: "Nathifa Khairiya Nugraha"
+    }
   }
-},
-{
-  year: "2021/2022",
-  image: "/images/Foto/21-22.jpg",
-  shalahudin: {
-    pradana: "Putraku Fawzan A",
-    pemangku: "Liuray Alif",
-    kerani: "Farid Multahadi",
-    jurang: "Althaf Bani Zachari S",
-    kadivTeknik: "Hamka Habibi Hidayatullah",
-    kadivOperasional: "Alaudin Indra Fata",
-    kadivPengmas: "Zaydan Althar Yazid"
-  },
-  fatimah: {
-    pradana: "Amalia Amatullah S",
-    pemangku: "Haniyyah Nafisa",
-    kerani: "Athira Fairuzuma A",
-    jurang: "Ridha Muthiah A",
-    kadivTeknik: "Taqiyya Fakhira N",
-    kadivOperasional: "Alisya Carbelia Anwar",
-    kadivPengmas: "Naura Alifa C.N"
-  }
-},
-{
-  year: "2022/2023",
-  image: "/images/Foto/22-23.jpg",
-  shalahudin: {
-    pradana: "Hamka Habibi Hidayatullah",
-    pemangku: "Ahmad Wafa",
-    kerani: "Muhammad Fatih Badruzzaman",
-    jurang: "Fatih Dhiayul Hilm",
-    kadivTeknik: "Muhamad Gavin Rajwa Quranridho",
-    kadivOperasional: "Naftali Arrayyan",
-    kadivPengmas: "Rasyad Aulia Dhava",
-    kadivHumas: "Aldan Aulia Rafif"
-  },
-  fatimah: {
-    pradana: "Naisa Nuzilla Iska",
-    pemangku: "Nadia Ailsa Diyanti",
-    kerani: "Zahira Salsabila Khairunnisa",
-    jurang: "Hasna Fatiha Jinan",
-    kadivTeknik: "Aqiilah Khairunnisa Azahrah",
-    kadivOperasional: "Salma Hidayaturrobina",
-    kadivPengmas: "Nawra Ghaya Tsabita",
-    kadivHumas: "Isyi Karimah"
-  }
-},
-{
-  year: "2023/2024",
-  image: "/images/Foto/23-24.jpg",
-  shalahudin: {
-    pradana: "Akhmad Syamil Aydin",
-    pemangku: "Haidar Mutawally Halim",
-    kerani: "Ahmad Fawwaz Reswara",
-    jurang: "Muhammad Naufal Firdaus Lazuardi",
-    kadivTeknik: "Lathiful Lisan",
-    kadivPengembangan: "Muhammad Rizki Athalla",
-    kadivPengmas: "Muhammad Athaya Habibi Djawa",
-    kadivHumas: "Ahmad Shofwan Isy Kariman",
-    kadivBisnis: "Salman Zhafran"
-  },
-  fatimah: {
-    pradana: "Amira Amatullah Karimah",
-    pemangku: "Wafiqah Syahla Widad",
-    kerani: "Reihana Fitria Yanuar",
-    jurang: "Kaylila Riani Maidi",
-    kadivTeknik: "Aliya Tazkia Hanum",
-    kadivPengembangan: "Arisa Novia Rosyadah",
-    kadivPengmas: "Nazifa Nur Amalina",
-    kadivHumas: "Yoshiko Ena",
-    kadivBisnis: "Buti Lubna Yurdha"
-  }
-},
-{
-  year: "2024/2025",
-  image: "/images/Foto/24-25.jpg",
-  shalahudin: {
-    pradana: "Darma Bachtiar Lubis",
-    pemangku: "Abdullah Yaumul Rahmat",
-    kerani: "Jazid Gumilar",
-    jurang: "Arfan Aqila Ihsan",
-    kadivTeknik: "Mohammad Aldhowi Ilmi Arsyad",
-    kadivPengembangan: "Abian Excel Hidayat",
-    kadivPengmas: "Muhammad Athaya Habibi Djawa",
-    kadivHumas: "Dhafin Zharfan Ghassani",
-    kadivBisnis: "Hanif Putra Abyan"
-  },
-  fatimah: {
-    pradana: "Azkahaura Fadhila Syarwani",
-    pemangku: "Zahira Ratnadhita",
-    kerani: "Alya Mukhbita",
-    jurang: "Aida Maheswari Suryantoro",
-    kadivTeknik: "Raisya Nurjulianti",
-    kadivPengembangan: "Andhiny Putri Salsabila",
-    kadivPengmas: "Maulida Dzikra Hanifah",
-    kadivHumas: "Aulia Azzahra",
-    kadivBisnis: "Nathifa Khairiya Nugraha"
-  }
-}
-
 ];
+
 
 // Navigation structure
 export const navigation = [
