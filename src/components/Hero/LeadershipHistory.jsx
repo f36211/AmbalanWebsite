@@ -18,82 +18,92 @@ const LeadershipHistory = ({ isVisible }) => {
           <div className="w-24 h-1 bg-[#f9ba02] mx-auto rounded-full"></div>
         </div>
 
-        <div className="space-y-12">
-          {periods.map((period, index) => (
-            <div
-              key={period.year}
-              id={`period-${index}`}
-              data-animate
-              className={`transform transition-all duration-1000 delay-${index * 100} ${
-                isVisible[`period-${index}`] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-              }`}
-            >
-              <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
-                
-                {/* Header */}
-                <div className="bg-[#5c0b08] text-white px-6 py-4 text-center">
-                  <h3 className="text-xl font-bold">
-                    PERIODE {period.year}
-                  </h3>
-                </div>
-
-                <div className="flex flex-col lg:flex-row">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+          {periods.map((period, index) => {
+            const totalMembers = Object.keys(period.putri).length + Object.keys(period.putra).length;
+            
+            return (
+              <div
+                key={period.year}
+                id={`period-${index}`}
+                data-animate
+                className={`transform transition-all duration-1000 delay-${index * 100} ${
+                  isVisible[`period-${index}`] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                } h-fit`}
+              >
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col">
                   
+                  {/* Header */}
+                  <div className="bg-[#5c0b08] text-white px-4 py-3 text-center flex-shrink-0">
+                    <h3 className="text-lg font-bold">
+                      PERIODE {period.year}
+                    </h3>
+                    <div className="text-xs opacity-80 mt-1">
+                      {totalMembers} Anggota
+                    </div>
+                  </div>
+
                   {/* Image Section */}
                   {period.image && (
-                    <div className="lg:w-1/3 h-64 lg:h-80 relative bg-gray-50 flex items-center justify-center p-6">
-                      <div className="w-full h-full max-w-xs">
+                    <div className="h-48 relative bg-gray-50 flex items-center justify-center p-4 flex-shrink-0">
+                      <div className="w-full h-full max-w-[200px]">
                         <img
                           src={period.image}
                           alt={`Foto Ambalan Periode ${period.year}`}
                           className="w-full h-full object-cover rounded-lg shadow-md"
                         />
                       </div>
-                      <div className="absolute bottom-3 right-3 bg-[#f9ba02] text-[#5c0b08] px-3 py-1 rounded-full text-xs font-semibold">
+                      <div className="absolute bottom-2 right-2 bg-[#f9ba02] text-[#5c0b08] px-2 py-1 rounded-full text-xs font-semibold">
                         Ambalan
                       </div>
                     </div>
                   )}
                   
                   {/* Content Section */}
-                  <div className={`${period.image ? 'lg:w-2/3' : 'w-full'} p-6`}>
-                    <div className="grid md:grid-cols-2 gap-8">
+                  <div className="p-4 flex-grow flex flex-col">
+                    <div className="grid grid-cols-1 gap-6 flex-grow">
                       
                       {/* Putri */}
-                      <div>
-                        <div className="flex items-center mb-4">
-                          <div className="w-4 h-4 bg-[#f9ba02] rounded-full mr-3"></div>
-                          <h4 className="text-lg font-bold text-[#5c0b08]">PUTRI</h4>
+                      <div className="flex-1">
+                        <div className="flex items-center mb-3">
+                          <div className="w-3 h-3 bg-[#f9ba02] rounded-full mr-2"></div>
+                          <h4 className="text-base font-bold text-[#5c0b08]">PUTRI</h4>
+                          <span className="ml-auto text-xs text-gray-500">
+                            {Object.keys(period.putri).length} orang
+                          </span>
                         </div>
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                           {Object.entries(period.putri).map(([role, name]) => (
-                            <div key={role} className="flex justify-between items-start py-2 border-b border-gray-100 last:border-b-0">
-                              <span className="text-sm font-medium text-gray-600 uppercase tracking-wide flex-shrink-0 w-20 sm:w-24">
+                            <div key={role} className="bg-gray-50 rounded-lg px-3 py-2">
+                              <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                                 {role.replace(/([A-Z])/g, ' $1').replace('_', ' ').trim()}
-                              </span>
-                              <span className="text-sm text-[#5c0b08] font-semibold text-right ml-4">
+                              </div>
+                              <div className="text-sm text-[#5c0b08] font-semibold">
                                 {name}
-                              </span>
+                              </div>
                             </div>
                           ))}
                         </div>
                       </div>
 
                       {/* Putra */}
-                      <div>
-                        <div className="flex items-center mb-4">
-                          <div className="w-4 h-4 bg-[#903d04] rounded-full mr-3"></div>
-                          <h4 className="text-lg font-bold text-[#5c0b08]">PUTRA</h4>
+                      <div className="flex-1">
+                        <div className="flex items-center mb-3">
+                          <div className="w-3 h-3 bg-[#903d04] rounded-full mr-2"></div>
+                          <h4 className="text-base font-bold text-[#5c0b08]">PUTRA</h4>
+                          <span className="ml-auto text-xs text-gray-500">
+                            {Object.keys(period.putra).length} orang
+                          </span>
                         </div>
-                        <div className="space-y-3">
+                        <div className="space-y-2">
                           {Object.entries(period.putra).map(([role, name]) => (
-                            <div key={role} className="flex justify-between items-start py-2 border-b border-gray-100 last:border-b-0">
-                              <span className="text-sm font-medium text-gray-600 uppercase tracking-wide flex-shrink-0 w-20 sm:w-24">
+                            <div key={role} className="bg-gray-50 rounded-lg px-3 py-2">
+                              <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                                 {role.replace(/([A-Z])/g, ' $1').replace('_', ' ').trim()}
-                              </span>
-                              <span className="text-sm text-[#5c0b08] font-semibold text-right ml-4">
+                              </div>
+                              <div className="text-sm text-[#5c0b08] font-semibold">
                                 {name}
-                              </span>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -102,8 +112,8 @@ const LeadershipHistory = ({ isVisible }) => {
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
