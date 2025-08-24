@@ -32,13 +32,16 @@ const LeadershipHistory = ({ isVisible }) => {
                 <div className="md:flex">
                   {/* Image Section */}
                   {period.image && (
-                    <div className="md:w-1/3 h-64 md:h-auto relative overflow-hidden">
+                    <div className="md:w-1/3 h-64 md:h-auto relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center p-4">
                       <img
                         src={period.image}
-                        alt={`Periode ${period.year}`}
-                        className="w-full h-full object-cover scale-90 group-hover:scale-100 transition-transform duration-700 cursor-pointer"
+                        alt={`Foto Ambalan Periode ${period.year}`}
+                        className="w-[85%] h-[85%] object-cover object-center rounded-xl shadow-lg scale-95 group-hover:scale-100 transition-all duration-700 cursor-pointer border-2 border-white/60"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#5c0b08]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#5c0b08]/10 to-[#903d04]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl"></div>
+                      <div className="absolute bottom-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-[#5c0b08] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        📸 Ambalan
+                      </div>
                     </div>
                   )}
                   
