@@ -32,21 +32,30 @@ const LeadershipHistory = ({ isVisible }) => {
                 <div className="md:flex">
                   {/* Image Section */}
                   {period.image && (
-                    <div className="md:w-1/3 h-64 md:h-auto relative overflow-hidden bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center p-4">
-                      <img
-                        src={period.image}
-                        alt={`Foto Ambalan Periode ${period.year}`}
-                        className="w-[85%] h-[85%] object-cover object-center rounded-xl shadow-lg scale-95 group-hover:scale-100 transition-all duration-700 cursor-pointer border-2 border-white/60"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#5c0b08]/10 to-[#903d04]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl"></div>
-                      <div className="absolute bottom-2 right-2 bg-white/80 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium text-[#5c0b08] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        📸 Ambalan
+                    <div className="md:w-1/2 lg:w-2/5 h-80 md:h-96 relative overflow-hidden bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex items-center justify-center p-6">
+                      <div className="relative w-full h-full max-w-sm max-h-80">
+                        <img
+                          src={period.image}
+                          alt={`Foto Ambalan Periode ${period.year}`}
+                          className="w-full h-full object-cover object-center rounded-2xl shadow-2xl scale-90 group-hover:scale-95 transition-all duration-700 cursor-pointer border-4 border-white/80 backdrop-blur-sm"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#5c0b08]/15 via-transparent to-[#903d04]/15 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"></div>
+                        <div className="absolute -top-3 -left-3 w-6 h-6 bg-gradient-to-br from-[#f9ba02] to-[#903d04] rounded-full shadow-lg opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute -top-3 -right-3 w-6 h-6 bg-gradient-to-br from-[#903d04] to-[#5c0b08] rounded-full shadow-lg opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute -bottom-3 -left-3 w-6 h-6 bg-gradient-to-br from-[#5c0b08] to-[#903d04] rounded-full shadow-lg opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <div className="absolute -bottom-3 -right-3 w-6 h-6 bg-gradient-to-br from-[#903d04] to-[#f9ba02] rounded-full shadow-lg opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
+                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full text-sm font-semibold text-[#5c0b08] shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-2 group-hover:translate-y-0">
+                        📸 Periode {period.year}
+                      </div>
+                      <div className="absolute top-4 right-4 bg-gradient-to-r from-[#903d04] to-[#5c0b08] text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg opacity-90 group-hover:opacity-100 transition-opacity duration-300">
+                        ⚜️ AMBALAN
                       </div>
                     </div>
                   )}
                   
                   {/* Content Section */}
-                  <div className={`${period.image ? 'md:w-2/3' : 'w-full'} p-4 sm:p-8`}>
+                  <div className={`${period.image ? 'md:w-1/2 lg:w-3/5' : 'w-full'} p-6 sm:p-8 lg:p-10 flex flex-col justify-center`}>
                     <div className="text-center mb-6 sm:mb-8">
                       <div className="inline-block bg-gradient-to-r from-[#903d04] to-[#5c0b08] text-white px-4 sm:px-6 py-2 rounded-full font-bold text-base sm:text-lg group-hover:shadow-lg group-hover:scale-105 transition-all duration-300 active:scale-95">
                         ⚜️ PERIODE {period.year} ⚜️
