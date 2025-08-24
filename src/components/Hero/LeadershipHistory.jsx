@@ -50,8 +50,8 @@ const LeadershipHistory = () => {
 
         {/* Timeline Container */}
         <div className="relative">
-          {/* Static timeline bar */}
-          <div className="absolute left-8 top-0 w-1 bg-gray-200 rounded-full" style={{ height: '100%' }}>
+          {/* Static timeline bar, responsive position */}
+          <div className="absolute left-4 md:left-8 top-0 w-1 bg-gray-200 rounded-full" style={{ height: '100%' }}>
             {/* Animated timeline progress bar */}
             <motion.div 
               className="w-full bg-[#5c0b08] rounded-full"
@@ -88,17 +88,18 @@ const TimelineCard = ({ period, index, totalMembers, isExpanded, onToggleExpande
   const isInView = useInView(cardRef, { once: false, margin: "-20% 0px" });
 
   return (
-    <div ref={cardRef} className="timeline-card relative pl-24 pr-8">
+    // Responsive padding for the timeline card container
+    <div ref={cardRef} className="timeline-card relative pl-12 md:pl-24 pr-0 md:pr-8">
       {/* Floating Year and Timeline Dot */}
       <motion.div 
-        className="absolute left-8 top-5 z-10 flex items-center"
+        className="absolute left-4 md:left-8 top-5 z-10 flex items-center"
         initial={{ opacity: 0 }}
         animate={isInView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        {/* Floating Year Text */}
+        {/* Floating Year Text - HIDDEN ON MOBILE, visible on medium screens and up */}
         <motion.div 
-          className="absolute right-full mr-6 text-right"
+          className="absolute right-full mr-6 text-right hidden md:block"
           initial={{ x: 20, opacity: 0 }}
           animate={isInView ? { x: 0, opacity: 1 } : { x: 20, opacity: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
@@ -144,13 +145,17 @@ const TimelineCard = ({ period, index, totalMembers, isExpanded, onToggleExpande
             </div>
           )}
           
-          {/* Details Section */}
-          <div className="flex-1 p-6">
+          {/* Details Section with responsive padding */}
+          <div className="flex-1 p-4 md:p-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row items-start justify-between mb-4">
               <div>
+                {/* Year Text - VISIBLE ON MOBILE, hidden on medium screens and up */}
+                <h4 className="text-md font-bold text-[#5c0b08] mb-2 md:hidden">
+                  Periode {period.year}
+                </h4>
                 <h3 className="text-2xl font-bold text-[#5c0b08] mb-1">
-                  Periode Kepengurusan
+                  Kepengurusan
                 </h3>
                 <div className="flex items-center flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
                   <span className="flex items-center">
@@ -174,7 +179,7 @@ const TimelineCard = ({ period, index, totalMembers, isExpanded, onToggleExpande
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >
-                <span>{isExpanded ? 'Sembunyikan' : 'Lihat Detail'}</span>
+                <span>{isExpanded ? 'Sembunyikan' : 'Lihat'}</span>
                 <motion.svg 
                   className="w-4 h-4"
                   fill="none" stroke="currentColor" viewBox="0 0 24 24"
@@ -198,7 +203,7 @@ const TimelineCard = ({ period, index, totalMembers, isExpanded, onToggleExpande
                     <span className="font-semibold text-[#5c0b08]">Pradana:</span> {period.putri.pradana}
                     {Object.keys(period.putri).length > 1 && (
                       <div className="text-xs text-gray-500 mt-1">
-                        +{Object.keys(period.putri).length - 1} anggota lainnya
+                        +{Object.keys(period.putri).length - 1} lainnya
                       </div>
                     )}
                   </div>
@@ -212,7 +217,7 @@ const TimelineCard = ({ period, index, totalMembers, isExpanded, onToggleExpande
                     <span className="font-semibold text-[#5c0b08]">Pradana:</span> {period.putra.pradana}
                     {Object.keys(period.putra).length > 1 && (
                       <div className="text-xs text-gray-500 mt-1">
-                        +{Object.keys(period.putra).length - 1} anggota lainnya
+                        +{Object.keys(period.putra).length - 1} lainnya
                       </div>
                     )}
                   </div>
@@ -229,7 +234,7 @@ const TimelineCard = ({ period, index, totalMembers, isExpanded, onToggleExpande
           transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
           className="overflow-hidden"
         >
-          <div className="border-t border-gray-100 bg-slate-50 p-6">
+          <div className="border-t border-gray-100 bg-slate-50 p-4 md:p-6">
             <div className="grid md:grid-cols-2 gap-6">
               
               {/* Putri Details */}
@@ -287,14 +292,4 @@ const TimelineCard = ({ period, index, totalMembers, isExpanded, onToggleExpande
   );
 };
 
-// Main App component to render the LeadershipHistory
-const App = () => {
-  return (
-    <div className="font-sans">
-      <LeadershipHistory />
-    </div>
-  );
-};
-
-
-export default App;
+export default LeadershipHistory;
