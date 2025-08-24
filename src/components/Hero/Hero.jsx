@@ -114,18 +114,14 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
           style={{ backgroundImage: `url("/images/landing/background.png")` }}
         />
 
-        {/* Center lights with floating animation - DESKTOP: CENTER, MOBILE: BOTTOM */}
+        {/* Center lights - FIXED POSITIONING: Always centered, behind group */}
         <motion.img
           src="/images/landing/centerlight.png"
           alt="center light"
-          className={`absolute ${
-            window.innerWidth < 768
-              ? "bottom-0 z-35"
-              : "top-1/2 -translate-y-1/2"
-          } left-1/2 -translate-x-1/2`}
+          className="absolute bottom-16 sm:bottom-20 md:bottom-24 lg:bottom-32 xl:bottom-40 left-1/2 -translate-x-1/2 z-20 w-64 sm:w-80 md:w-96 lg:w-[28rem] xl:w-[32rem] h-auto"
           animate={{
-            scale: [1, 1.1, 1],
-            opacity: window.innerWidth < 768 ? [0.6, 0.8, 0.6] : [0.8, 1, 0.8],
+            scale: [1, 1.05, 1],
+            opacity: [0.7, 0.9, 0.7],
           }}
           transition={{
             duration: 4,
@@ -137,15 +133,11 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
         <motion.img
           src="/images/landing/centerlight2.png"
           alt="center light 2"
-          className={`absolute ${
-            window.innerWidth < 768
-              ? "bottom-0 z-35"
-              : "top-1/2 -translate-y-1/2"
-          } left-1/2 -translate-x-1/2`}
+          className="absolute bottom-16 sm:bottom-20 md:bottom-24 lg:bottom-32 xl:bottom-40 left-1/2 -translate-x-1/2 z-20 w-64 sm:w-80 md:w-96 lg:w-[28rem] xl:w-[32rem] h-auto"
           animate={{
-            scale: [1.1, 1, 1.1],
-            opacity: window.innerWidth < 768 ? [0.8, 0.6, 0.8] : [1, 0.8, 1],
-            rotate: [0, 5, -5, 0],
+            scale: [1.05, 1, 1.05],
+            opacity: [0.9, 0.7, 0.9],
+            rotate: [0, 3, -3, 0],
           }}
           transition={{
             duration: 6,
@@ -194,7 +186,7 @@ const Hero = ({ onModalStateChange }) => {
   const [activeModal, setActiveModal] = useState(null);
   const [clickedLogoType, setClickedLogoType] = useState(null);
   const containerRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
+  const [screenSize, setScreenSize] = useState('desktop');
 
   const logoData = {
     putri: {
@@ -210,7 +202,7 @@ const Hero = ({ onModalStateChange }) => {
   };
 
   const handleLogoClick = (logoType) => {
-    if (window.innerWidth < 768) return;
+    if (screenSize === 'mobile') return;
 
     if (activeModal === logoType) {
       setActiveModal(null);
@@ -234,7 +226,14 @@ const Hero = ({ onModalStateChange }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      const width = window.innerWidth;
+      if (width < 768) {
+        setScreenSize('mobile');
+      } else if (width < 1024) {
+        setScreenSize('tablet');
+      } else {
+        setScreenSize('desktop');
+      }
     };
 
     handleResize();
@@ -298,6 +297,18 @@ const Hero = ({ onModalStateChange }) => {
     },
   };
 
+  // Responsive logo sizes
+  const getLogoSize = () => {
+    switch (screenSize) {
+      case 'mobile':
+        return "w-14 h-14";
+      case 'tablet':
+        return "w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32";
+      default:
+        return "w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40";
+    }
+  };
+
   return (
     <motion.section
       ref={containerRef}
@@ -309,50 +320,64 @@ const Hero = ({ onModalStateChange }) => {
       <FloatingParticles />
       <AnimatedBackground backgroundOpacity={backgroundOpacity} />
 
+      {/* Bottom paper - positioned above center lights */}
       <motion.img
         src="/images/landing/kertasbawah.png"
         alt="bottom paper"
-        className="absolute bottom-0 left-0 w-full z-40 object-cover"
+        className="absolute bottom-0 left-0 w-full z-30 object-cover"
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 1, duration: 1 }}
       />
+
+      {/* Group of people - highest z-index to be in front of lights */}
       <motion.img
         src="/images/landing/Groupsorang.png"
         alt="group of people"
-        className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-full ${
-          isMobile ? "max-w-6xl mb-15" : "max-w-4xl sm:max-w-4xl md:max-w-5xl"
-        } z-40 object-contain`}
+        className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-full z-40 object-contain ${
+          screenSize === 'mobile' 
+            ? "max-w-6xl mb-15" 
+            : screenSize === 'tablet'
+            ? "max-w-5xl sm:max-w-6xl"
+            : "max-w-4xl sm:max-w-4xl md:max-w-5xl"
+        }`}
         initial={{ y: 100, opacity: 0, scale: 0.8 }}
-        animate={{ y: 0, opacity: 1, scale: isMobile ? 1.6 : 1.2 }}
+        animate={{ 
+          y: 0, 
+          opacity: 1, 
+          scale: screenSize === 'mobile' ? 1.6 : screenSize === 'tablet' ? 1.4 : 1.2 
+        }}
         transition={{ delay: 1.2, duration: 1.2, type: "spring", damping: 20 }}
         style={{
           filter: "drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3))",
         }}
       />
 
-      {!isMobile && (
+      {/* Desktop and Tablet Logo positioning */}
+      {screenSize !== 'mobile' && (
         <motion.div
           variants={itemVariants}
           className="absolute inset-x-0 top-1/2 -translate-y-1/2 z-[80]"
         >
-          <div className="flex justify-between items-center w-full px-4 sm:px-8 lg:px-16 relative">
+          <div className={`flex justify-between items-center w-full relative ${
+            screenSize === 'tablet' ? 'px-6 sm:px-8' : 'px-4 sm:px-8 lg:px-16'
+          }`}>
             <motion.img
               src="/images/logo/L2.png"
               alt="Scout Logo Putra"
-              className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 drop-shadow-2xl cursor-pointer relative"
+              className={`${getLogoSize()} drop-shadow-2xl cursor-pointer relative`}
               variants={logoVariants}
               animate={{
                 opacity: activeModal === "putra" ? 1 : activeModal ? 0.3 : 1,
                 scale: activeModal === "putra" ? 1.9 : activeModal ? 0.7 : 1,
                 y: activeModal === "putra" ? 15 : 0,
-                x: activeModal === "putra" ? 50 : 0,
+                x: activeModal === "putra" ? (screenSize === 'tablet' ? 30 : 50) : 0,
                 rotate: 0,
               }}
               whileHover={
                 !activeModal
                   ? {
-                      scale: 1.2,
+                      scale: screenSize === 'tablet' ? 1.15 : 1.2,
                       rotate: -10,
                       y: -10,
                       opacity: 1,
@@ -364,7 +389,7 @@ const Hero = ({ onModalStateChange }) => {
                     }
                   : activeModal === "putra"
                   ? {
-                      scale: 1.85,
+                      scale: screenSize === 'tablet' ? 1.75 : 1.85,
                       y: -2,
                       rotate: 0,
                       opacity: 1,
@@ -392,19 +417,19 @@ const Hero = ({ onModalStateChange }) => {
             <motion.img
               src="/images/logo/L3.png"
               alt="Scout Logo Putri"
-              className="w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 drop-shadow-2xl cursor-pointer relative"
+              className={`${getLogoSize()} drop-shadow-2xl cursor-pointer relative`}
               variants={logoVariants}
               animate={{
                 opacity: activeModal === "putri" ? 1 : activeModal ? 0.3 : 1,
                 scale: activeModal === "putri" ? 1.9 : activeModal ? 0.7 : 1,
                 y: activeModal === "putri" ? 15 : 0,
-                x: activeModal === "putri" ? -80 : 0,
+                x: activeModal === "putri" ? (screenSize === 'tablet' ? -60 : -80) : 0,
                 rotate: 0,
               }}
               whileHover={
                 !activeModal
                   ? {
-                      scale: 1.2,
+                      scale: screenSize === 'tablet' ? 1.15 : 1.2,
                       rotate: 10,
                       y: -10,
                       opacity: 1,
@@ -416,7 +441,7 @@ const Hero = ({ onModalStateChange }) => {
                     }
                   : activeModal === "putri"
                   ? {
-                      scale: 1.7,
+                      scale: screenSize === 'tablet' ? 1.6 : 1.7,
                       y: -8,
                       rotate: 0,
                       opacity: 1,
@@ -444,11 +469,11 @@ const Hero = ({ onModalStateChange }) => {
         </motion.div>
       )}
 
-      {/* BUG FIX: Added a unique 'key' to the direct child of AnimatePresence */}
+      {/* Main content */}
       <AnimatePresence>
         {!activeModal && (
           <motion.div
-            key="heroContent" // This key is the fix
+            key="heroContent"
             className="relative z-10 text-center max-w-6xl mx-auto px-4 sm:px-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -458,22 +483,28 @@ const Hero = ({ onModalStateChange }) => {
             <motion.div
               variants={itemVariants}
               className={`flex ${
-                isMobile ? "flex-col" : ""
+                screenSize === 'mobile' ? "flex-col" : ""
               } items-center justify-center relative ${
-                isMobile ? "bottom-2" : "bottom-10 sm:bottom-20 md:bottom-32"
+                screenSize === 'mobile' 
+                  ? "bottom-2" 
+                  : screenSize === 'tablet'
+                  ? "bottom-8 sm:bottom-12 md:bottom-16"
+                  : "bottom-10 sm:bottom-20 md:bottom-32"
               }`}
             >
               <motion.img
                 src="/images/landing/ambalantext.png"
                 alt="Ambalan Text"
                 className={`w-full ${
-                  isMobile
+                  screenSize === 'mobile'
                     ? "max-w-md mb-4"
+                    : screenSize === 'tablet'
+                    ? "max-w-xl sm:max-w-2xl md:max-w-3xl mb-6 z-50"
                     : "max-w-2xl sm:max-w-1xl md:max-w-2xl lg:max-w-3xl mb-30 z-50"
                 }`}
                 initial={{ scale: 0.5, opacity: 0, rotateX: 90 }}
                 animate={{
-                  scale: isMobile ? 1.0 : 1.2,
+                  scale: screenSize === 'mobile' ? 1.0 : screenSize === 'tablet' ? 1.1 : 1.2,
                   opacity: 1,
                   rotateX: 0,
                 }}
@@ -484,7 +515,7 @@ const Hero = ({ onModalStateChange }) => {
                   delay: 0.8,
                 }}
                 whileHover={{
-                  scale: isMobile ? 1.05 : 1.25,
+                  scale: screenSize === 'mobile' ? 1.05 : screenSize === 'tablet' ? 1.15 : 1.25,
                   transition: { duration: 0.3 },
                 }}
                 style={{
@@ -492,7 +523,8 @@ const Hero = ({ onModalStateChange }) => {
                 }}
               />
 
-              {isMobile && (
+              {/* Mobile logo layout */}
+              {screenSize === 'mobile' && (
                 <motion.div
                   className="flex justify-center items-center gap-6 mt-4"
                   variants={itemVariants}
@@ -521,7 +553,8 @@ const Hero = ({ onModalStateChange }) => {
               )}
             </motion.div>
 
-            {!isMobile && (
+            {/* Corner lights - only on desktop */}
+            {screenSize === 'desktop' && (
               <>
                 <motion.img
                   src="/images/landing/Cahaya2.png"
@@ -565,7 +598,8 @@ const Hero = ({ onModalStateChange }) => {
         )}
       </AnimatePresence>
 
-      {!isMobile && (
+      {/* Modal - only on desktop and tablet */}
+      {screenSize !== 'mobile' && (
         <LogoModal
           isOpen={activeModal !== null}
           onClose={closeModal}
