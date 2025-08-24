@@ -144,7 +144,7 @@ export const tentangKamiData = {
     },
     info: {
       namaAmbalan: "Ambalan SMAIT Ummul Quro",
-      tingkat: "Penegak & Pandega"
+      tingkat: "Penegak"
     }
   },
   sejarah: {
