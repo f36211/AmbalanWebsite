@@ -18,7 +18,7 @@ const LeadershipHistory = ({ isVisible }) => {
           <div className="w-24 h-1 bg-[#f9ba02] mx-auto rounded-full"></div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
           {periods.map((period, index) => {
             const totalMembers = Object.keys(period.putri).length + Object.keys(period.putra).length;
             
@@ -29,12 +29,12 @@ const LeadershipHistory = ({ isVisible }) => {
                 data-animate
                 className={`transform transition-all duration-1000 delay-${index * 100} ${
                   isVisible[`period-${index}`] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-                } h-fit`}
+                } break-inside-avoid mb-6`}
               >
-                <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300">
                   
                   {/* Header */}
-                  <div className="bg-[#5c0b08] text-white px-4 py-3 text-center flex-shrink-0">
+                  <div className="bg-[#5c0b08] text-white px-4 py-3 text-center">
                     <h3 className="text-lg font-bold">
                       PERIODE {period.year}
                     </h3>
@@ -45,14 +45,12 @@ const LeadershipHistory = ({ isVisible }) => {
 
                   {/* Image Section */}
                   {period.image && (
-                    <div className="h-48 relative bg-gray-50 flex items-center justify-center p-4 flex-shrink-0">
-                      <div className="w-full h-full max-w-[200px]">
-                        <img
-                          src={period.image}
-                          alt={`Foto Ambalan Periode ${period.year}`}
-                          className="w-full h-full object-cover rounded-lg shadow-md"
-                        />
-                      </div>
+                    <div className="relative bg-gray-50">
+                      <img
+                        src={period.image}
+                        alt={`Foto Ambalan Periode ${period.year}`}
+                        className="w-full h-auto object-cover"
+                      />
                       <div className="absolute bottom-2 right-2 bg-[#f9ba02] text-[#5c0b08] px-2 py-1 rounded-full text-xs font-semibold">
                         Ambalan
                       </div>
@@ -60,53 +58,51 @@ const LeadershipHistory = ({ isVisible }) => {
                   )}
                   
                   {/* Content Section */}
-                  <div className="p-4 flex-grow flex flex-col">
-                    <div className="grid grid-cols-1 gap-6 flex-grow">
-                      
-                      {/* Putri */}
-                      <div className="flex-1">
-                        <div className="flex items-center mb-3">
-                          <div className="w-3 h-3 bg-[#f9ba02] rounded-full mr-2"></div>
-                          <h4 className="text-base font-bold text-[#5c0b08]">PUTRI</h4>
-                          <span className="ml-auto text-xs text-gray-500">
-                            {Object.keys(period.putri).length} orang
-                          </span>
-                        </div>
-                        <div className="space-y-2">
-                          {Object.entries(period.putri).map(([role, name]) => (
-                            <div key={role} className="bg-gray-50 rounded-lg px-3 py-2">
-                              <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
-                                {role.replace(/([A-Z])/g, ' $1').replace('_', ' ').trim()}
-                              </div>
-                              <div className="text-sm text-[#5c0b08] font-semibold">
-                                {name}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                  <div className="p-4">
+                    
+                    {/* Putri */}
+                    <div className="mb-6">
+                      <div className="flex items-center mb-3">
+                        <div className="w-3 h-3 bg-[#f9ba02] rounded-full mr-2"></div>
+                        <h4 className="text-base font-bold text-[#5c0b08]">PUTRI</h4>
+                        <span className="ml-auto text-xs text-gray-500">
+                          {Object.keys(period.putri).length} orang
+                        </span>
                       </div>
-
-                      {/* Putra */}
-                      <div className="flex-1">
-                        <div className="flex items-center mb-3">
-                          <div className="w-3 h-3 bg-[#903d04] rounded-full mr-2"></div>
-                          <h4 className="text-base font-bold text-[#5c0b08]">PUTRA</h4>
-                          <span className="ml-auto text-xs text-gray-500">
-                            {Object.keys(period.putra).length} orang
-                          </span>
-                        </div>
-                        <div className="space-y-2">
-                          {Object.entries(period.putra).map(([role, name]) => (
-                            <div key={role} className="bg-gray-50 rounded-lg px-3 py-2">
-                              <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
-                                {role.replace(/([A-Z])/g, ' $1').replace('_', ' ').trim()}
-                              </div>
-                              <div className="text-sm text-[#5c0b08] font-semibold">
-                                {name}
-                              </div>
+                      <div className="space-y-2">
+                        {Object.entries(period.putri).map(([role, name]) => (
+                          <div key={role} className="bg-gray-50 rounded-lg px-3 py-2">
+                            <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                              {role.replace(/([A-Z])/g, ' $1').replace('_', ' ').trim()}
                             </div>
-                          ))}
-                        </div>
+                            <div className="text-sm text-[#5c0b08] font-semibold">
+                              {name}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Putra */}
+                    <div>
+                      <div className="flex items-center mb-3">
+                        <div className="w-3 h-3 bg-[#903d04] rounded-full mr-2"></div>
+                        <h4 className="text-base font-bold text-[#5c0b08]">PUTRA</h4>
+                        <span className="ml-auto text-xs text-gray-500">
+                          {Object.keys(period.putra).length} orang
+                        </span>
+                      </div>
+                      <div className="space-y-2">
+                        {Object.entries(period.putra).map(([role, name]) => (
+                          <div key={role} className="bg-gray-50 rounded-lg px-3 py-2">
+                            <div className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
+                              {role.replace(/([A-Z])/g, ' $1').replace('_', ' ').trim()}
+                            </div>
+                            <div className="text-sm text-[#5c0b08] font-semibold">
+                              {name}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
