@@ -82,7 +82,7 @@ export const periods = [
   {
     year: "2020/2021",
     image: "/images/Foto/20-21.jpg",
-    shalahudin: {
+    putra: {
       pradana: "Zainal Muttaqin",
       pemangku: "Muhammad Ikhwan Fathin Dzikra",
       kerani: "Muhammad Ilham Umri",
@@ -92,7 +92,7 @@ export const periods = [
       kadivPengmas: "Izzudin Rizqullah",
       kadivHumas: "Muhammad Albani Kafka L.H."
     },
-    fatimah: {
+    putri: {
       pradana: "Istiqomatunnisa",
       pemangku: "Tafida Rizkia Ula",
       kerani: "Elvanya Nandayu Bunga Satiko",
@@ -106,7 +106,7 @@ export const periods = [
   {
     year: "2021/2022",
     image: "/images/Foto/21-22.jpg",
-    shalahudin: {
+    putra: {
       pradana: "Putraku Fawzan A",
       pemangku: "Liuray Alif",
       kerani: "Farid Multahadi",
@@ -115,7 +115,7 @@ export const periods = [
       kadivOperasional: "Alaudin Indra Fata",
       kadivPengmas: "Zaydan Althar Yazid"
     },
-    fatimah: {
+    putri: {
       pradana: "Amalia Amatullah S",
       pemangku: "Haniyyah Nafisa",
       kerani: "Athira Fairuzuma A",
@@ -128,7 +128,7 @@ export const periods = [
   {
     year: "2022/2023",
     image: "/images/Foto/22-23.jpg",
-    shalahudin: {
+    putra: {
       pradana: "Hamka Habibi Hidayatullah",
       pemangku: "Ahmad Wafa",
       kerani: "Muhammad Fatih Badruzzaman",
@@ -138,7 +138,7 @@ export const periods = [
       kadivPengmas: "Rasyad Aulia Dhava",
       kadivHumas: "Aldan Aulia Rafif"
     },
-    fatimah: {
+    putri: {
       pradana: "Naisa Nuzilla Iska",
       pemangku: "Nadia Ailsa Diyanti",
       kerani: "Zahira Salsabila Khairunnisa",
@@ -152,7 +152,7 @@ export const periods = [
   {
     year: "2023/2024",
     image: "/images/Foto/23-24.jpg",
-    shalahudin: {
+    putra: {
       pradana: "Akhmad Syamil Aydin",
       pemangku: "Haidar Mutawally Halim",
       kerani: "Ahmad Fawwaz Reswara",
@@ -163,7 +163,7 @@ export const periods = [
       kadivHumas: "Ahmad Shofwan Isy Kariman",
       kadivBisnis: "Salman Zhafran"
     },
-    fatimah: {
+    putri: {
       pradana: "Amira Amatullah Karimah",
       pemangku: "Wafiqah Syahla Widad",
       kerani: "Reihana Fitria Yanuar",
@@ -178,7 +178,7 @@ export const periods = [
   {
     year: "2024/2025",
     image: "/images/Foto/24-25.jpg",
-    shalahudin: {
+    putra: {
       pradana: "Darma Bachtiar Lubis",
       pemangku: "Abdullah Yaumul Rahmat",
       kerani: "Jazid Gumilar",
@@ -189,7 +189,7 @@ export const periods = [
       kadivHumas: "Dhafin Zharfan Ghassani",
       kadivBisnis: "Hanif Putra Abyan"
     },
-    fatimah: {
+    putri: {
       pradana: "Azkahaura Fadhila Syarwani",
       pemangku: "Zahira Ratnadhita",
       kerani: "Alya Mukhbita",
@@ -202,6 +202,7 @@ export const periods = [
     }
   }
 ];
+
 
 
 // Navigation structure
