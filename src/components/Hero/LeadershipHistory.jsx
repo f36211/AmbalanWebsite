@@ -36,7 +36,7 @@ const LeadershipHistory = ({ isVisible }) => {
                       <img
                         src={period.image}
                         alt={`Periode ${period.year}`}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 cursor-pointer"
+                        className="w-full h-full object-cover scale-90 group-hover:scale-100 transition-transform duration-700 cursor-pointer"
                       />
                       <div className="absolute inset-0 bg-gradient-to-r from-[#5c0b08]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </div>
