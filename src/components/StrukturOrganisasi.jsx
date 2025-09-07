@@ -1,98 +1,312 @@
 import React from 'react';
-import { Users, Crown, Shield, Star } from 'lucide-react';
-import { strukturOrganisasiData } from '../data/index.js';
+import { motion } from 'framer-motion';
+import { Users, Crown, Shield, Star, Award } from 'lucide-react';
+import { periods } from '../data/index.js';
 
 const StrukturOrganisasi = ({ isVisible }) => {
-  const { title, subtitle, orgChartTitle, pembina, struktur } = strukturOrganisasiData;
+  const latestPeriod = periods[periods.length - 1];
+  const { year, putra, putri } = latestPeriod;
+
+  const generateStruktur = (data, gender) => {
+    return Object.entries(data).map(([key, value]) => {
+      const isPradana = key.includes('pradana');
+      const isPemangku = key.includes('pemangku');
+      
+      return {
+        icon: isPradana ? 'Crown' : isPemangku ? 'Shield' : 'Star',
+        jabatan: key.charAt(0).toUpperCase() + key.slice(1),
+        nama: value,
+        gender,
+        isPradana,
+        isPemangku,
+        priority: isPradana ? 1 : isPemangku ? 2 : 3
+      };
+    });
+  };
+
+  // Sort by priority and separate by gender
+  const putraStructure = generateStruktur(putra, 'Putra').sort((a, b) => a.priority - b.priority);
+  const putriStructure = generateStruktur(putri, 'Putri').sort((a, b) => a.priority - b.priority);
 
   const getIconComponent = (iconName) => {
-    const icons = {
-      Crown,
-      Shield,
-      Star,
-      Users
-    };
+    const icons = { Crown, Shield, Star, Users, Award };
     return icons[iconName] || Users;
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 50, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
+
   return (
-    <section className="py-12 sm:py-20 bg-gradient-to-r from-amber-50 to-orange-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 bg-gradient-to-br from-slate-50 via-white to-amber-50/30 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-[#5c0b08]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#f9ba02]/10 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Header */}
-        <div 
-          id="struktur-header" 
-          data-animate 
-          className={`text-center mb-16 transform transition-all duration-1000 ${
-            isVisible['struktur-header'] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}
+        <motion.div 
+          className="text-center mb-20"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#5c0b08] mb-4 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-[#5c0b08] hover:to-[#903d04] transition-all duration-500 cursor-default">
-            {title}
+          <h2 className="text-5xl md:text-6xl font-bold text-[#5c0b08] mb-6">
+            Kepemimpinan
           </h2>
-          <div className="w-16 sm:w-24 h-1 bg-gradient-to-r from-[#903d04] to-[#9c7502] mx-auto rounded-full animate-pulse"></div>
-          {subtitle && <p className="text-gray-600 mt-4 text-lg">{subtitle}</p>}
-        </div>
+          <div className="inline-flex items-center bg-[#5c0b08] text-white px-6 py-3 rounded-full text-lg font-semibold mb-6">
+            <Award className="w-5 h-5 mr-2" />
+            Periode {year}
+          </div>
+          <div className="w-32 h-1 bg-gradient-to-r from-[#5c0b08] to-[#f9ba02] mx-auto rounded-full"></div>
+        </motion.div>
 
-        {/* Struktur Cards */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {struktur.map((person, index) => {
-            const IconComponent = getIconComponent(person.icon);
-            return (
-              <div
-                key={index}
-                id={`struktur-${index}`}
-                data-animate
-                className={`transform transition-all duration-1000 delay-${index * 100} ${
-                  isVisible[`struktur-${index}`] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-                }`}
-              >
-                <div className="bg-white rounded-2xl p-6 shadow-lg border border-orange-100 hover:shadow-2xl hover:scale-105 transition-all duration-300 group">
-                  <div className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-r ${person.color} rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className="w-8 h-8 text-white" />
-                  </div>
-                  <div className="text-center">
-                    <h3 className="text-xl font-bold text-[#5c0b08] mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#5c0b08] group-hover:to-[#903d04] transition-all duration-300">
-                      {person.jabatan}
-                    </h3>
-                    <p className="text-lg font-semibold text-[#903d04] mb-1">{person.nama}</p>
-                    <p className="text-sm text-gray-600">{person.periode}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Organizational Chart */}
-        <div 
-          id="org-chart" 
-          data-animate 
-          className={`transform transition-all duration-1000 delay-500 ${
-            isVisible['org-chart'] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-          }`}
+        {/* Pradana Section - Main Leaders */}
+        <motion.div 
+          className="mb-20"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg border border-orange-100">
-            <h3 className="text-2xl font-bold text-[#5c0b08] mb-6 text-center flex items-center justify-center gap-3">
-              <Users className="w-8 h-8 text-[#903d04]" />
-              {orgChartTitle}
-            </h3>
-            <div className="text-center">
-              <div className="inline-block bg-gradient-to-r from-amber-100 to-orange-100 rounded-lg p-4 mb-4">
-                <p className="text-[#5c0b08] font-semibold">{pembina.title}</p>
-                <p className="text-sm text-gray-600">{pembina.name}</p>
-              </div>
-              <div className="w-px h-8 bg-[#903d04] mx-auto mb-4"></div>
-              <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                {struktur.filter(person => person.jabatan.includes('Pradana')).map((person, index) => (
-                  <div key={index} className={`bg-gradient-to-r ${index === 0 ? 'from-blue-100 to-blue-200' : 'from-pink-100 to-pink-200'} rounded-lg p-4`}>
-                    <p className="font-semibold text-[#5c0b08]">{person.jabatan}</p>
-                    <p className="text-sm text-gray-600">{person.description}</p>
+          <motion.div variants={itemVariants} className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-[#5c0b08] mb-2">Pradana Ambalan</h3>
+            <p className="text-gray-600">Pimpinan Tertinggi Ambalan</p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+            {[...putraStructure.filter(p => p.isPradana), ...putriStructure.filter(p => p.isPradana)].map((person, index) => {
+              const IconComponent = getIconComponent(person.icon);
+              
+              return (
+                <motion.div
+                  key={`pradana-${index}`}
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.05, y: -10 }}
+                  className="relative group"
+                >
+                  {/* Main Card */}
+                  <div className="relative bg-gradient-to-br from-[#5c0b08] to-[#903d04] rounded-3xl p-8 shadow-2xl overflow-hidden">
+                    {/* Decorative Elements */}
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full translate-y-16 -translate-x-16"></div>
+                    
+                    {/* Leader Logo */}
+                    <motion.div 
+                      className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-6 mx-auto relative z-10 overflow-hidden"
+                      whileHover={{ rotate: 5, scale: 1.1 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <img 
+                        src={person.gender === 'Putra' ? 'images/logo/L2.png' : 'images/logo/L3.png'}
+                        alt={`Logo ${person.gender}`}
+                        className="w-12 h-12 object-contain"
+                        onError={(e) => {
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'block';
+                        }}
+                      />
+                      <IconComponent className="w-10 h-10 text-white hidden" />
+                    </motion.div>
+
+                    {/* Content */}
+                    <div className="text-center relative z-10">
+                      <div className="mb-4">
+                        <span className="inline-block bg-white/20 text-white text-sm font-semibold px-4 py-1 rounded-full mb-2">
+                          {person.gender}
+                        </span>
+                        <h4 className="text-white/90 text-lg font-semibold uppercase tracking-widest">
+                          {person.jabatan}
+                        </h4>
+                      </div>
+                      
+                      <h3 className="text-3xl font-bold text-white mb-2 leading-tight">
+                        {person.nama}
+                      </h3>
+                    </div>
+
+                    {/* Shine Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                   </div>
-                ))}
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* Pemangku Section */}
+        {[...putraStructure.filter(p => p.isPemangku), ...putriStructure.filter(p => p.isPemangku)].length > 0 && (
+          <motion.div 
+            className="mb-16"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={itemVariants} className="text-center mb-10">
+              <h3 className="text-2xl font-bold text-[#903d04] mb-2">Pemangku Adat</h3>
+              <p className="text-gray-600">Pendamping dan Penasihat</p>
+            </motion.div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {[...putraStructure.filter(p => p.isPemangku), ...putriStructure.filter(p => p.isPemangku)].map((person, index) => {
+                const IconComponent = getIconComponent(person.icon);
+                
+                return (
+                  <motion.div
+                    key={`pemangku-${index}`}
+                    variants={itemVariants}
+                    whileHover={{ y: -5 }}
+                    className="group"
+                  >
+                    <div className="relative">
+                      {/* Profile Circle */}
+                      <motion.div 
+                        className="w-32 h-32 bg-gradient-to-br from-[#903d04] to-[#5c0b08] rounded-full mx-auto mb-6 flex items-center justify-center shadow-xl"
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <IconComponent className="w-16 h-16 text-white" />
+                      </motion.div>
+
+                      {/* Content */}
+                      <div className="text-center">
+                        <div className="mb-3">
+                          <span className="inline-block bg-[#903d04]/10 text-[#903d04] text-sm font-semibold px-3 py-1 rounded-full mb-2">
+                            {person.gender}
+                          </span>
+                          <h4 className="text-[#903d04] text-sm font-semibold uppercase tracking-wider">
+                            {person.jabatan}
+                          </h4>
+                        </div>
+                        
+                        <h3 className="text-xl font-bold text-[#5c0b08] leading-tight">
+                          {person.nama}
+                        </h3>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
               </div>
+          </motion.div>
+        )}
+
+        {/* Other Members Section */}
+        {[...putraStructure.filter(p => !p.isPradana && !p.isPemangku), ...putriStructure.filter(p => !p.isPradana && !p.isPemangku)].length > 0 && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={itemVariants} className="text-center mb-10">
+              <h3 className="text-xl font-bold text-gray-700 mb-2">Tim Kepengurusan</h3>
+              <p className="text-gray-600">Anggota Pengurus Ambalan</p>
+            </motion.div>
+
+            <div className="grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {[...putraStructure.filter(p => !p.isPradana && !p.isPemangku), ...putriStructure.filter(p => !p.isPradana && !p.isPemangku)].map((person, index) => {
+                const IconComponent = getIconComponent(person.icon);
+                
+                return (
+                  <motion.div
+                    key={`member-${index}`}
+                    variants={itemVariants}
+                    whileHover={{ y: -3, scale: 1.02 }}
+                    className="group"
+                  >
+                    <div className="text-center">
+                      {/* Profile Circle */}
+                      <motion.div 
+                        className="w-24 h-24 bg-gradient-to-br from-[#f9ba02] to-[#903d04] rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg"
+                        whileHover={{ rotate: 5 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <IconComponent className="w-10 h-10 text-white" />
+                      </motion.div>
+
+                      {/* Content */}
+                      <div>
+                        <div className="mb-2">
+                          <span className="inline-block bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded-full mb-1">
+                            {person.gender}
+                          </span>
+                          <h4 className="text-gray-600 text-xs font-semibold uppercase tracking-wide">
+                            {person.jabatan}
+                          </h4>
+                        </div>
+                        
+                        <h3 className="text-sm font-bold text-[#5c0b08] leading-tight">
+                          {person.nama}
+                        </h3>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Summary Stats */}
+        <motion.div 
+          className="mt-20"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-white/20">
+            <div className="grid sm:grid-cols-3 gap-8 text-center">
+              <motion.div whileHover={{ scale: 1.05 }}>
+                <div className="w-16 h-16 bg-[#5c0b08] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-3xl font-bold text-[#5c0b08] mb-1">
+                  {Object.keys(putra).length + Object.keys(putri).length}
+                </p>
+                <p className="text-gray-600 font-medium">Total Pengurus</p>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.05 }}>
+                <div className="w-16 h-16 bg-[#903d04] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Crown className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-3xl font-bold text-[#903d04] mb-1">
+                  {Object.keys(putra).length}
+                </p>
+                <p className="text-gray-600 font-medium">Pengurus Putra</p>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.05 }}>
+                <div className="w-16 h-16 bg-[#f9ba02] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Star className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-3xl font-bold text-[#f9ba02] mb-1">
+                  {Object.keys(putri).length}
+                </p>
+                <p className="text-gray-600 font-medium">Pengurus Putri</p>
+              </motion.div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
