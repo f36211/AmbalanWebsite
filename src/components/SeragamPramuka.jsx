@@ -4,12 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 const SeragamPramuka = () => {
   const images = [
     {
-      src: '/images/imags/pramuka.jpg',
+      src: '/images/imags/pramuka.webp',
       alt: 'Seragam Pramuka',
       title: 'Seragam Pramuka'
     },
     {
-      src: '/images/imags/ambalan.jpg',
+      src: '/images/imags/ambalan.webp',
       alt: 'Seragam Ambalan', 
       title: 'Seragam Ambalan'
     }

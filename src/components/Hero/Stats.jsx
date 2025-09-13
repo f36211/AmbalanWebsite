@@ -10,7 +10,7 @@ const Stats = ({ isVisible }) => {
       {/* Background pattern for stats */}
       <div className="absolute inset-0 opacity-3">
         <div className="absolute inset-0 bg-center bg-no-repeat bg-cover" style={{
-          backgroundImage: `url("images/Foto/Foto.jpeg")`
+          backgroundImage: `url("images/Foto/Foto.webp")`
         }}>
         </div>
       </div>

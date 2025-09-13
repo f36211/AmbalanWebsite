@@ -206,14 +206,14 @@ const Navigation = ({ isScrolled, isModalOpen = false }) => {
                   onClick={() => setShowCompactNav(false)}
                 >
                   <motion.img
-                    src="/images/logo/L3.png"
+                    src="/images/logo/L3.webp"
                     alt="Logo Ambalan Putra"
                     className="w-6 h-6"
                     whileHover={{ scale: 1.1, rotate: 3 }}
                     transition={{ type: "spring", stiffness: 300 }}
                   />
                   <motion.img
-                    src="/images/logo/L2.png"
+                    src="/images/logo/L2.webp"
                     alt="Logo Ambalan Putri"
                     className="w-6 h-6"
                     whileHover={{ scale: 1.1, rotate: -3 }}
@@ -310,7 +310,7 @@ const Navigation = ({ isScrolled, isModalOpen = false }) => {
           <motion.div
             className="fixed w-full top-0 z-40 h-32 sm:h-40 lg:h-48 bg-cover bg-center bg-no-repeat"
             style={{
-              backgroundImage: 'url("/images/landing/kertasatas.png")',
+              backgroundImage: 'url("/images/landing/kertasatas.webp")',
             }}
             variants={topDownVariants}
             initial="hidden"

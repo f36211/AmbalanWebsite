@@ -76,7 +76,7 @@ const LogoModal = ({ isOpen, onClose, logoData, clickedLogoType }) => {
               className="absolute inset-0 bg-cover bg-center bg-no-repeat"
               style={{
                 backgroundImage: `url("${
-                  logoData?.imageUrl || "/images/landing/background.png"
+                  logoData?.imageUrl || "/images/landing/background.webp"
                 }")`,
               }}
             />
@@ -111,12 +111,12 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
           animate={{ scale: 1 }}
           transition={{ duration: 2, ease: "easeOut" }}
           className="absolute inset-0 bg-center bg-no-repeat bg-cover"
-          style={{ backgroundImage: `url("/images/landing/background.png")` }}
+          style={{ backgroundImage: `url("/images/landing/background.webp")` }}
         />
 
         {/* Center lights - FIXED POSITIONING: Always centered, behind group */}
         <motion.img
-          src="/images/landing/centerlight.png"
+          src="/images/landing/centerlight.webp"
           alt="center light"
           className="absolute bottom-16 sm:bottom-20 md:bottom-24 lg:bottom-32 xl:bottom-40 left-1/2 -translate-x-1/2 z-20 w-64 sm:w-80 md:w-96 lg:w-[28rem] xl:w-[32rem] h-auto"
           animate={{
@@ -131,7 +131,7 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
         />
 
         <motion.img
-          src="/images/landing/centerlight2.png"
+          src="/images/landing/centerlight2.webp"
           alt="center light 2"
           className="absolute bottom-16 sm:bottom-20 md:bottom-24 lg:bottom-32 xl:bottom-40 left-1/2 -translate-x-1/2 z-20 w-64 sm:w-80 md:w-96 lg:w-[28rem] xl:w-[32rem] h-auto"
           animate={{
@@ -149,14 +149,14 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
         {/* Red background overlay */}
         <motion.div
           className="absolute inset-0 bg-center bg-no-repeat bg-cover"
-          style={{ backgroundImage: `url("/images/landing/redbg.png")` }}
+          style={{ backgroundImage: `url("/images/landing/redbg.webp")` }}
           animate={{ opacity: [0.7, 0.5, 0.7] }}
           transition={{ duration: 8, repeat: Infinity }}
         />
 
         {/* Side lights with gentle sway */}
         <motion.img
-          src="/images/landing/anotherlight.png"
+          src="/images/landing/anotherlight.webp"
           alt="left light"
           className="absolute left-0 top-0 h-full"
           animate={{ opacity: [0.7, 0.5, 0.7] }}
@@ -164,7 +164,7 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
         />
 
         <motion.img
-          src="/images/landing/anotherlight2.png"
+          src="/images/landing/anotherlight2.webp"
           alt="right light"
           className="absolute right-0 top-0 h-full"
           animate={{ opacity: [0.7, 0.5, 0.7] }}
@@ -192,12 +192,12 @@ const Hero = ({ onModalStateChange }) => {
     putri: {
       title: "Logo Scout Putri",
       description: "Simbolisme dan makna logo Pramuka untuk anggota putri",
-      imageUrl: "/images/landing/putri.png",
+      imageUrl: "/images/landing/putri.webp",
     },
     putra: {
       title: "Logo Scout Putra",
       description: "Simbolisme dan makna logo Pramuka untuk anggota putra",
-      imageUrl: "/images/landing/putra.png",
+      imageUrl: "/images/landing/putra.webp",
     },
   };
 
@@ -322,7 +322,7 @@ const Hero = ({ onModalStateChange }) => {
 
       {/* Bottom paper - positioned above center lights */}
       <motion.img
-        src="/images/landing/kertasbawah.png"
+        src="/images/landing/kertasbawah.webp"
         alt="bottom paper"
         className="absolute bottom-0 left-0 w-full z-30 object-cover"
         initial={{ y: 100, opacity: 0 }}
@@ -332,7 +332,7 @@ const Hero = ({ onModalStateChange }) => {
 
       {/* Group of people - highest z-index to be in front of lights */}
       <motion.img
-        src="/images/landing/Groupsorang.png"
+        src="/images/landing/Groupsorang.webp"
         alt="group of people"
         className={`absolute bottom-0 left-1/2 -translate-x-1/2 w-full z-40 object-contain ${
           screenSize === 'mobile' 

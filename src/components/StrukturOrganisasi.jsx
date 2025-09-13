@@ -117,7 +117,7 @@ const StrukturOrganisasi = ({ isVisible }) => {
                       transition={{ duration: 0.3 }}
                     >
                       <img 
-                        src={person.gender === 'Putra' ? 'images/logo/L2.png' : 'images/logo/L3.png'}
+                        src={person.gender === 'Putra' ? 'images/logo/L2.webp' : 'images/logo/L3.webp'}
                         alt={`Logo ${person.gender}`}
                         className="w-12 h-12 object-contain"
                         onError={(e) => {
