@@ -187,6 +187,47 @@ const Hero = ({ onModalStateChange }) => {
   const [clickedLogoType, setClickedLogoType] = useState(null);
   const containerRef = useRef(null);
   const [screenSize, setScreenSize] = useState('desktop');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const images = [
+      "/images/landing/background.webp",
+      "/images/landing/centerlight.webp",
+      "/images/landing/centerlight2.webp",
+      "/images/landing/redbg.webp",
+      "/images/landing/anotherlight.webp",
+      "/images/landing/anotherlight2.webp",
+      "/images/landing/kertasbawah.webp",
+      "/images/landing/Groupsorang.webp",
+      "/images/logo/L2.png",
+      "/images/logo/L3.png",
+      "/images/landing/ambalantext.png",
+      "/images/landing/Cahaya2.png",
+      "/images/landing/Cahaya1.png",
+      "/images/landing/putri.webp",
+      "/images/landing/putra.webp",
+    ];
+
+    const promises = images.map((src) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+    });
+
+    Promise.all(promises)
+      .then(() => {
+        setLoading(false);
+        setBackgroundOpacity(100);
+      })
+      .catch((err) => {
+        console.error("Failed to load images", err);
+        setLoading(false);
+      });
+  }, []);
+
 
   const logoData = {
     putri: {
@@ -239,9 +280,7 @@ const Hero = ({ onModalStateChange }) => {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    const timer = setTimeout(() => {
-      setBackgroundOpacity(100);
-    }, 1000);
+    
 
     const handleScroll = () => {
       if (activeModal) {
@@ -252,7 +291,7 @@ const Hero = ({ onModalStateChange }) => {
     window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      clearTimeout(timer);
+      
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("scroll", handleScroll);
     };
@@ -308,6 +347,14 @@ const Hero = ({ onModalStateChange }) => {
         return "w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40";
     }
   };
+
+  if (loading) {
+    return (
+      <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black pt-24">
+        <p className="text-white">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <motion.section
