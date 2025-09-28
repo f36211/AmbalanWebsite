@@ -30,17 +30,6 @@ const Login = ({ onLogin }) => {
         setCredentials({ username: "", password: "" });
         onLogin(true);
       }
-      if (
-        credentials.username === adminUsername &&
-        credentials.password === adminPassword
-      ) {
-        const token = btoa(`${credentials.username}:${credentials.password}`); // Add this
-        localStorage.setItem("adminToken", token); // Add this
-        localStorage.setItem("adminAuthenticated", "true");
-        localStorage.setItem("adminUsername", credentials.username);
-        setCredentials({ username: "", password: "" });
-        onLogin(true);
-      }
     } catch (err) {
       setError("Terjadi kesalahan saat login");
     } finally {

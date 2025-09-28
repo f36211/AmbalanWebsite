@@ -1,8 +1,7 @@
 import express from 'express';
 import { createClient } from '@supabase/supabase-js';
 import cors from 'cors';
-
-require('dotenv').config();
+import 'dotenv/config';
 
 const app = express();
 const PORT = process.env.PORT || 5000;

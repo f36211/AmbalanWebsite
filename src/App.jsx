@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   BrowserRouter as Router,
   Routes,
@@ -12,11 +13,12 @@ import Hero from "./components/Hero/Hero";
 import LeadershipHistory from "./components/Hero/LeadershipHistory";
 import Footer from "./components/Hero/Footer";
 import GlobalStyles from "./components/Hero/GlobalStyles";
+import Breadcrumb from './components/ui/Breadcrumb';
 import AdminApp from "./components/admin/AdminApp";
 import Filosofi from "./components/filosofi.jsx";
-import Achivements from "./components/achivements.jsx";
+import Achievements from "./components/Achievements.jsx";
 
-// Import all components from components folder (moved from routes/)
+// Import all components from components folder
 import TentangKami from "./components/TentangKami";
 import StrukturOrganisasi from "./components/StrukturOrganisasi";
 import FotoKegiatan from "./components/FotoKegiatan";
@@ -109,7 +111,7 @@ const useRouteVisibility = () => {
 };
 
 // Home component that contains all the sections from the original single-page layout
-const Home = ({ onModalStateChange }) => {
+const Home = ({ onModalStateChange, hideLoader }) => {
   const { isVisible } = useRouteVisibility();
 
   return (
@@ -117,6 +119,7 @@ const Home = ({ onModalStateChange }) => {
       <Hero 
         isVisible={isVisible} 
         onModalStateChange={onModalStateChange}
+        hideLoader={hideLoader}
       />
       <TentangKami isVisible={isVisible} />
       <LeadershipHistory isVisible={isVisible} />
@@ -126,9 +129,15 @@ const Home = ({ onModalStateChange }) => {
 
 // Wrapper component for individual route pages
 const PageWrapper = ({ children }) => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
   return (
     <div className="pt-20 min-h-screen relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">{children}</div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {!isHomePage && <Breadcrumb />}
+        {children}
+      </div>
     </div>
   );
 };
@@ -177,12 +186,41 @@ const RouteComponent = ({ Component, isFullSize = false }) => {
     }
   });
 
+  const pageVariants = {
+    initial: {
+      opacity: 0,
+      y: 20,
+    },
+    in: {
+      opacity: 1,
+      y: 0,
+    },
+    out: {
+      opacity: 0,
+      y: -20,
+    },
+  };
+
+  const pageTransition = {
+    type: "tween",
+    ease: "anticipate",
+    duration: 0.5,
+  };
+
   const WrapperComponent = isFullSize ? FullSizeWrapper : PageWrapper;
 
   return (
-    <WrapperComponent>
-      <Component isVisible={enhancedVisibility} />
-    </WrapperComponent>
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+    >
+      <WrapperComponent>
+        <Component isVisible={enhancedVisibility} />
+      </WrapperComponent>
+    </motion.div>
   );
 };
 
@@ -206,11 +244,16 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-white to-orange-50">
           <div className="text-center p-8">
+            <img 
+              src="/images/logo/LogoTransparant.webp" 
+              alt="Error Illustration" 
+              className="w-64 h-64 mx-auto mb-8" 
+            />
             <h1 className="text-2xl font-bold text-red-600 mb-4">
-              Something went wrong
+              Oops! Something went wrong.
             </h1>
             <p className="text-gray-600 mb-4">
-              Please check the console for more details.
+              We're sorry, but it seems like there's a technical issue. Please try again later.
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -231,8 +274,51 @@ const AppContent = () => {
   const { isScrolled } = useScrollAndAnimation();
   const location = useLocation();
   
-  // MODAL STATE MANAGEMENT - Added this section
+  // MODAL STATE MANAGEMENT
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loaderHidden, setLoaderHidden] = useState(false);
+
+  // More robust hideLoader function
+  const hideLoader = useRef(() => {
+    if (loaderHidden) return; // Prevent multiple calls
+    
+    setLoaderHidden(true);
+    
+    const loader = document.getElementById('loader');
+    if (!loader) {
+      console.warn('Loader element not found');
+      return;
+    }
+
+    // Check if already hidden
+    if (loader.style.display === 'none' || loader.style.opacity === '0') {
+      return;
+    }
+
+    // Smooth hide animation
+    loader.style.opacity = '0';
+    loader.style.transition = 'opacity 0.5s ease-out';
+    loader.style.pointerEvents = 'none';
+
+    // Remove from DOM after animation
+    setTimeout(() => {
+      if (loader && loader.parentNode) {
+        loader.style.display = 'none';
+      }
+    }, 500);
+  }).current;
+
+  // Fallback loader timeout - hide after 8 seconds no matter what
+  useEffect(() => {
+    const fallbackTimeout = setTimeout(() => {
+      if (!loaderHidden) {
+        console.warn('Fallback: Hiding loader after 8 seconds');
+        hideLoader();
+      }
+    }, 8000);
+
+    return () => clearTimeout(fallbackTimeout);
+  }, [hideLoader, loaderHidden]);
 
   // Handle modal state changes from Hero component
   const handleModalStateChange = (modalState) => {
@@ -276,7 +362,7 @@ const AppContent = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-[#5c0b08]/5 via-[#903d04]/3 to-[#9c7502]/5"></div>
       </div>
 
-      {/* UPDATED NAVIGATION WITH MODAL STATE */}
+      {/* NAVIGATION WITH MODAL STATE */}
       <Navigation 
         isScrolled={isScrolled} 
         isModalOpen={isModalOpen}
@@ -285,78 +371,80 @@ const AppContent = () => {
       {/* Main Content Area with Routes */}
       <main className={`relative z-10`}>
         <ErrorBoundary>
-          <Routes>
-            {/* UPDATED HOME ROUTE WITH MODAL STATE HANDLER */}
-            <Route 
-              path="/" 
-              element={
-                <Home onModalStateChange={handleModalStateChange} />
-              } 
-            />
-            
-            {/* Regular routes with PageWrapper */}
-            <Route
-              path="/tentang-kami"
-              element={<RouteComponent Component={TentangKami} />}
-            />
-            <Route
-              path="/foto-kegiatan"
-              element={<RouteComponent Component={FotoKegiatan} />}
-            />
-            <Route
-              path="/foto-purna-ambalan"
-              element={<RouteComponent Component={FotoPurnaAmbalan} />}
-            />
-            <Route
-              path="/seragam"
-              element={<RouteComponent Component={SeragamPramuka} />}
-            />
-            <Route
-              path="/materi-pramuka"
-              element={<RouteComponent Component={MateriPramuka} isFullSize={true} />}
-            />
-            <Route
-              path="/admin"
-              element={<RouteComponent Component={AdminApp} />}
-            />
-            
-            {/* Full-size routes (SVG, diagrams, charts, etc.) */}
-            <Route
-              path="/struktur-organisasi"
-              element={<RouteComponent Component={StrukturOrganisasi}/>}
-            />
-            <Route
-              path="/filosofi"
-              element={<RouteComponent Component={Filosofi} isFullSize={true} />}
-            />
-            <Route
-              path="/achievements"
-              element={<RouteComponent Component={Achivements} isFullSize={true} />}
-            />
-            
-            {/* 404 Route */}
-            <Route
-              path="*"
-              element={
-                <PageWrapper>
-                  <div className="text-center py-20">
-                    <h1 className="text-4xl font-bold text-gray-600 mb-4">
-                      404
-                    </h1>
-                    <p className="text-gray-500 mb-8">
-                      Halaman tidak ditemukan
-                    </p>
-                    <Link
-                      to="/"
-                      className="inline-block px-6 py-3 bg-gradient-to-r from-[#5c0b08] to-[#903d04] text-white rounded-lg hover:shadow-lg transition-all duration-300"
-                    >
-                      Kembali ke Beranda
-                    </Link>
-                  </div>
-                </PageWrapper>
-              }
-            />
-          </Routes>
+          <AnimatePresence mode="wait">
+            <Routes location={location} key={location.pathname}>
+              {/* HOME ROUTE WITH MODAL STATE HANDLER */}
+              <Route 
+                path="/" 
+                element={
+                  <Home onModalStateChange={handleModalStateChange} hideLoader={hideLoader} />
+                } 
+              />
+              
+              {/* Regular routes with PageWrapper */}
+              <Route
+                path="/tentang-kami"
+                element={<RouteComponent Component={TentangKami} />}
+              />
+              <Route
+                path="/foto-kegiatan"
+                element={<RouteComponent Component={FotoKegiatan} />}
+              />
+              <Route
+                path="/foto-purna-ambalan"
+                element={<RouteComponent Component={FotoPurnaAmbalan} />}
+              />
+              <Route
+                path="/seragam"
+                element={<RouteComponent Component={SeragamPramuka} />}
+              />
+              <Route
+                path="/materi-pramuka"
+                element={<RouteComponent Component={MateriPramuka} isFullSize={true} />}
+              />
+              <Route
+                path="/admin"
+                element={<RouteComponent Component={AdminApp} />}
+              />
+              
+              {/* Full-size routes (SVG, diagrams, charts, etc.) */}
+              <Route
+                path="/struktur-organisasi"
+                element={<RouteComponent Component={StrukturOrganisasi} isFullSize={true} />}
+              />
+              <Route
+                path="/filosofi"
+                element={<RouteComponent Component={Filosofi} isFullSize={true} />}
+              />
+              <Route
+                path="/achievements"
+                element={<RouteComponent Component={Achievements} isFullSize={true} />}
+              />
+              
+              {/* 404 Route */}
+              <Route
+                path="*"
+                element={
+                  <PageWrapper>
+                    <div className="text-center py-20">
+                      <h1 className="text-4xl font-bold text-gray-600 mb-4">
+                        404
+                      </h1>
+                      <p className="text-gray-500 mb-8">
+                        Halaman tidak ditemukan
+                      </p>
+                      <Link
+                        to="/"
+                        className="inline-block px-6 py-3 bg-gradient-to-r from-[#5c0b08] to-[#903d04] text-white rounded-lg hover:shadow-lg transition-all duration-300"
+                      >
+                        Kembali ke Beranda
+                      </Link>
+                    </div>
+                  </PageWrapper>
+                }
+              />
+            </Routes>
+          </AnimatePresence>
         </ErrorBoundary>
       </main>
 
