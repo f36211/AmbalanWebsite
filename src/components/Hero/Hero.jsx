@@ -230,7 +230,6 @@ const Hero = ({ onModalStateChange }) => {
   const [activeModal, setActiveModal] = useState(null);
   const [clickedLogoType, setClickedLogoType] = useState(null);
   const containerRef = useRef(null);
-  const [loading, setLoading] = useState(true);
   const [screenSize, setScreenSize] = useState('lg');
 
   // Track screen size for responsive adjustments
@@ -251,43 +250,9 @@ const Hero = ({ onModalStateChange }) => {
   }, []);
 
   useEffect(() => {
-    const images = [
-      "/images/landing/background.webp",
-      "/images/landing/centerlight.webp",
-      "/images/landing/centerlight2.webp",
-      "/images/landing/redbg.webp",
-      "/images/landing/anotherlight.webp",
-      "/images/landing/anotherlight2.webp",
-      "/images/landing/kertasbawah.webp",
-      "/images/landing/Groupsorang.webp",
-      "/images/logo/L2.png",
-      "/images/logo/L3.png",
-      "/images/landing/ambalantext.png",
-      "/images/landing/Cahaya2.png",
-      "/images/landing/Cahaya1.png",
-      "/images/landing/putri.webp",
-      "/images/landing/putra.webp",
-    ];
-
-    const promises = images.map((src) => {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.src = src;
-        img.onload = resolve;
-        img.onerror = reject;
-      });
-    });
-
-    Promise.all(promises)
-      .then(() => {
-        setLoading(false);
-        setBackgroundOpacity(100);
-      })
-      .catch((err) => {
-        console.error("Failed to load images", err);
-        setLoading(false);
-        setBackgroundOpacity(100);
-      });
+    // Set background opacity after a short delay to allow for fade-in effect
+    const timer = setTimeout(() => setBackgroundOpacity(100), 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const logoData = {
@@ -426,17 +391,7 @@ const Hero = ({ onModalStateChange }) => {
     },
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-amber-400/20 border-t-amber-400 rounded-full"
-        />
-      </div>
-    );
-  }
+
 
   // Get responsive classes based on screen size
   const getResponsiveClasses = () => {

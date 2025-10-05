@@ -16,26 +16,6 @@ const SeragamPramuka = () => {
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Preload images
-  useEffect(() => {
-    const preloadImages = async () => {
-      const promises = images.map(img => {
-        return new Promise((resolve) => {
-          const image = new Image();
-          image.onload = resolve;
-          image.onerror = resolve;
-          image.src = img.src;
-        });
-      });
-      
-      await Promise.all(promises);
-      setIsLoading(false);
-    };
-
-    preloadImages();
-  }, []);
 
   const goToSlide = (index) => {
     setCurrentIndex(index);
@@ -83,24 +63,7 @@ const SeragamPramuka = () => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [currentIndex]);
 
-  if (isLoading) {
-    return (
-      <div className="h-screen w-full bg-gray-50 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center space-y-4"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-8 h-8 border-2 border-amber-600 border-t-transparent rounded-full"
-          />
-          <p className="text-sm text-gray-600 font-medium">Loading...</p>
-        </motion.div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="h-screen w-full bg-white flex flex-col overflow-hidden">

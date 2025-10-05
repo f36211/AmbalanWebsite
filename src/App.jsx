@@ -17,6 +17,7 @@ import Breadcrumb from './components/ui/Breadcrumb';
 import AdminApp from "./components/admin/AdminApp";
 import Filosofi from "./components/filosofi.jsx";
 import Achievements from "./components/Achievements.jsx";
+import LoadingScreen from "./components/ui/LoadingScreen.jsx";
 
 // Import all components from components folder
 import TentangKami from "./components/TentangKami";
@@ -111,7 +112,7 @@ const useRouteVisibility = () => {
 };
 
 // Home component that contains all the sections from the original single-page layout
-const Home = ({ onModalStateChange, hideLoader }) => {
+const Home = ({ onModalStateChange }) => {
   const { isVisible } = useRouteVisibility();
 
   return (
@@ -119,7 +120,6 @@ const Home = ({ onModalStateChange, hideLoader }) => {
       <Hero 
         isVisible={isVisible} 
         onModalStateChange={onModalStateChange}
-        hideLoader={hideLoader}
       />
       <TentangKami isVisible={isVisible} />
       <LeadershipHistory isVisible={isVisible} />
@@ -276,49 +276,68 @@ const AppContent = () => {
   
   // MODAL STATE MANAGEMENT
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loaderHidden, setLoaderHidden] = useState(false);
 
-  // More robust hideLoader function
-  const hideLoader = useRef(() => {
-    if (loaderHidden) return; // Prevent multiple calls
-    
-    setLoaderHidden(true);
-    
-    const loader = document.getElementById('loader');
-    if (!loader) {
-      console.warn('Loader element not found');
-      return;
-    }
+  // Loading State Management
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true); // Changed from useRef to useState
+  const loadStartTime = useRef(null);
 
-    // Check if already hidden
-    if (loader.style.display === 'none' || loader.style.opacity === '0') {
-      return;
-    }
-
-    // Smooth hide animation
-    loader.style.opacity = '0';
-    loader.style.transition = 'opacity 0.5s ease-out';
-    loader.style.pointerEvents = 'none';
-
-    // Remove from DOM after animation
-    setTimeout(() => {
-      if (loader && loader.parentNode) {
-        loader.style.display = 'none';
-      }
-    }, 500);
-  }).current;
-
-  // Fallback loader timeout - hide after 8 seconds no matter what
+  // Effect for initial page load
   useEffect(() => {
-    const fallbackTimeout = setTimeout(() => {
-      if (!loaderHidden) {
-        console.warn('Fallback: Hiding loader after 8 seconds');
-        hideLoader();
-      }
-    }, 8000);
+    loadStartTime.current = Date.now();
+    
+    const handleInitialLoad = () => {
+      const loadDuration = Date.now() - loadStartTime.current;
+      const minLoadTime = 600; // Reduced from 1000ms to 600ms for faster initial load
+      const remainingTime = Math.max(0, minLoadTime - loadDuration);
 
-    return () => clearTimeout(fallbackTimeout);
-  }, [hideLoader, loaderHidden]);
+      setTimeout(() => {
+        setIsPageLoading(false);
+        setIsInitialLoad(false); // Changed from isInitialLoad.current = false
+      }, remainingTime);
+    };
+
+    // Check if the document is already loaded
+    if (document.readyState === 'complete') {
+      handleInitialLoad();
+    } else {
+      window.addEventListener('load', handleInitialLoad, { once: true });
+      
+      // Fallback timeout in case load event doesn't fire
+      const fallbackTimeout = setTimeout(handleInitialLoad, 2000); // Reduced from 3000ms
+      
+      return () => {
+        window.removeEventListener('load', handleInitialLoad);
+        clearTimeout(fallbackTimeout);
+      };
+    }
+  }, []);
+
+  // Effect for handling loading screen on route changes
+  useEffect(() => {
+    // Don't run this on the initial load
+    if (isInitialLoad) {
+      return;
+    }
+
+    // Show loading screen
+    setIsPageLoading(true);
+    loadStartTime.current = Date.now();
+
+    // Hide loading screen after a minimum display time
+    const minLoadTime = 500; // Reduced from 800ms to 500ms for snappier route changes
+    const navigationLoadTimer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, minLoadTime);
+
+    return () => {
+      clearTimeout(navigationLoadTimer);
+    };
+  }, [location.pathname, isInitialLoad]);
+
+  // Determine if we should show full-screen loading
+  // Full screen when: initial load OR navigating to home page
+  const isFullScreenLoading = isInitialLoad || location.pathname === "/";
 
   // Handle modal state changes from Hero component
   const handleModalStateChange = (modalState) => {
@@ -354,6 +373,7 @@ const AppContent = () => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
+      <LoadingScreen isLoading={isPageLoading} isInitialLoad={isFullScreenLoading} />
       <GlobalStyles />
       <ScrollToTop />
 
@@ -364,6 +384,8 @@ const AppContent = () => {
 
       {/* NAVIGATION WITH MODAL STATE */}
       <Navigation 
+        isPageLoading={isPageLoading}
+        isInitialLoad={isFullScreenLoading}
         isScrolled={isScrolled} 
         isModalOpen={isModalOpen}
       />
@@ -377,7 +399,7 @@ const AppContent = () => {
               <Route 
                 path="/" 
                 element={
-                  <Home onModalStateChange={handleModalStateChange} hideLoader={hideLoader} />
+                  <Home onModalStateChange={handleModalStateChange} />
                 } 
               />
               

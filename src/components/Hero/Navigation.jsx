@@ -4,9 +4,7 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { navigation } from "../../data/index";
 
-
-
-const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
+const Navigation = ({ isPageLoading, isInitialLoad = false, isScrolled = false, isModalOpen = false }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [touchStart, setTouchStart] = useState(null);
@@ -16,17 +14,14 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Check if we're on the home/landing page
   const isHomePage = location.pathname === "/";
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
     setActiveDropdown(null);
     setShowCompactNav(false);
   }, [location]);
 
-  // Close menus when modal state changes
   useEffect(() => {
     if (isModalOpen) {
       setIsMenuOpen(false);
@@ -89,7 +84,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
     setShowCompactNav(!showCompactNav);
   };
 
-  // Updated route mapping to match App.jsx routes
   const getRouteFromTitle = (itemTitle) => {
     const routeMap = {
       "Struktur Organisasi": "/struktur-organisasi",
@@ -109,7 +103,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
   const handleNavigation = (itemTitle, e) => {
     e.preventDefault();
     const route = getRouteFromTitle(itemTitle);
-    // Add a small delay to ensure smooth transition
     setTimeout(() => {
       navigate(route);
       closeMobileMenu();
@@ -122,7 +115,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
     return location.pathname === route;
   };
 
-  // Animation variants
   const topDownVariants = {
     hidden: {
       y: "-100%",
@@ -165,7 +157,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
   if (isModalOpen) {
     return (
       <>
-        {/* Compact Navigation Toggle Button */}
         <motion.div
           className="fixed top-4 right-4 z-[70]"
           initial={{ scale: 0, rotate: -180 }}
@@ -189,7 +180,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
           </button>
         </motion.div>
 
-        {/* Compact Navigation Menu */}
         <AnimatePresence>
           {showCompactNav && (
             <motion.div
@@ -200,7 +190,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
             >
               <div className="p-4">
-                {/* Compact Logo */}
                 <Link
                   to="/"
                   className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-200/50"
@@ -225,7 +214,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
                   </span>
                 </Link>
 
-                {/* Compact Navigation Items */}
                 <div className="space-y-2">
                   {navigation.map((item, index) => (
                     <motion.div
@@ -302,12 +290,13 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
     );
   }
 
-  // NORMAL NAVIGATION WHEN MODAL IS CLOSED
+  // NORMAL NAVIGATION - Hide only on initial load, show on navigation loads
+  const shouldShowNav = !isPageLoading || !isInitialLoad;
+
   return (
     <>
-      {/* Background Image Layer with Smooth Animation */}
       <AnimatePresence>
-        {isHomePage && !isScrolled && !isModalOpen && (
+        {isHomePage && !isScrolled && !isModalOpen && shouldShowNav && (
           <motion.div
             className="fixed w-full top-0 z-40 h-32 sm:h-40 lg:h-48 bg-cover bg-center bg-no-repeat"
             style={{
@@ -318,7 +307,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
             animate="visible"
             exit="exit"
           >
-            {/* Animated overlay */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-transparent"
               initial={{ opacity: 0 }}
@@ -329,15 +317,13 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
         )}
       </AnimatePresence>
 
-      {/* Navigation Bar */}
       <motion.nav
         className="fixed w-full top-0 z-50"
         variants={topDownVariants}
         initial="hidden"
-        animate="visible"
+        animate={shouldShowNav ? "visible" : "hidden"}
         exit="exit"
       >
-        {/* Background */}
         <motion.div
           className="absolute inset-0 w-full h-full border-b shadow-xl"
           variants={navVariants}
@@ -346,7 +332,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
           }
         />
 
-        {/* Content */}
         <div className="relative">
           <div className="max-w-7xl mx-auto">
             <motion.div
@@ -356,7 +341,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
                 transition: { duration: 0.5, ease: "easeInOut" },
               }}
             >
-              {/* Logo */}
               <Link
                 to="/"
                 className="flex items-center gap-4"
@@ -417,7 +401,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
                 </motion.div>
               </Link>
 
-              {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-1 lg:space-x-2">
                 {navigation.map((item, index) => (
                   <div key={item.title} className="relative">
@@ -443,7 +426,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
                       </motion.div>
                     </motion.button>
 
-                    {/* Desktop Dropdown */}
                     <AnimatePresence>
                       {activeDropdown === index && (
                         <motion.div
@@ -470,13 +452,14 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
                                 initial="hidden"
                                 animate="visible"
                                 exit="hidden"
-                                                                whileHover={{
-                                                                  backgroundColor: "#e5e7eb",
-                                                                  color: "#5c0b08",
-                                                                  scale: 1.05,
-                                                                  transition: { duration: 0.15 }
-                                                                }}
-                                                              >                                <span className="flex items-center gap-1 lg:gap-2">
+                                whileHover={{
+                                  backgroundColor: "#e5e7eb",
+                                  color: "#5c0b08",
+                                  scale: 1.05,
+                                  transition: { duration: 0.15 }
+                                }}
+                              >
+                                <span className="flex items-center gap-1 lg:gap-2">
                                   <motion.div
                                     className={`w-2 h-2 rounded-full opacity-60 ${
                                       isActiveRoute(child)
@@ -498,10 +481,8 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
                     </AnimatePresence>
                   </div>
                 ))}
-
               </div>
 
-              {/* Mobile Menu Button */}
               <motion.button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`md:hidden p-2 sm:p-3 rounded-xl transition-all duration-300 ${
@@ -528,16 +509,14 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
         </div>
       </motion.nav>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            className="md:hidden fixed inset-0 z-30"
+            className="md:hidden fixed inset-0 z-60"
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Backdrop */}
             <motion.div
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               initial={{ opacity: 0 }}
@@ -546,7 +525,6 @@ const Navigation = ({ isScrolled = false, isModalOpen = false }) => {
               onClick={closeMobileMenu}
             />
 
-            {/* Menu Content */}
             <motion.div
               className="absolute right-0 top-0 h-full w-4/5 max-w-sm bg-white/90 backdrop-blur-xl border-l border-orange-100 shadow-2xl"
               initial={{ x: "100%" }}

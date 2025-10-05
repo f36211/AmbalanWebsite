@@ -5,35 +5,12 @@
     <link rel="icon" type="image/png" href="/images/logo/L1.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ambalan || SMAIT UMMUL QURO BOGOR</title>
-    <link rel="stylesheet" href="/src/loading.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   </head>
   <body>
-    <div id="loader">
-      <img src="/images/logo/LogoTransparant.webp" alt="Ambalan Logo">
-      <div class="spinner"></div>
-      <p id="loader-text">Loading...</p>
-    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script>
-      const messages = [
-        "Menyiapkan bivak... ⛺",
-        "Mencari kayu bakar... 🔥",
-        "Menyalakan api unggun... 🔥",
-        "Memasang tenda... ⛺",
-        "Menjelajah hutan... 🌳",
-        "Mengamati bintang... ✨"
-      ];
-      let messageIndex = 0;
-      const loaderText = document.getElementById('loader-text');
-
-      setInterval(() => {
-        messageIndex = (messageIndex + 1) % messages.length;
-        loaderText.textContent = messages[messageIndex];
-      }, 2000);
-    </script>
   </body>
 </html>

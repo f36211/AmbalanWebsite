@@ -69,7 +69,7 @@ const MateriPramukaPage = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
@@ -102,13 +102,7 @@ const MateriPramukaPage = () => {
     };
   }, []);
 
-  // Initial loading state
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+
 
   // Touch handlers for swipe navigation
   const handleTouchStart = useCallback((e) => {
@@ -179,33 +173,7 @@ const MateriPramukaPage = () => {
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className={`relative z-10 min-h-screen flex flex-col justify-center ${isMobile ? 'px-3 py-6' : 'px-4 py-8'}`}>
-          <div className="max-w-6xl mx-auto w-full">
-            <motion.div 
-              className={`flex justify-center ${isMobile ? 'mb-8' : 'gap-8 mb-12'}`}
-            >
-              {Array.from({ length: materialsPerPage }, (_, index) => (
-                <CardSkeleton key={index} isMobile={isMobile} />
-              ))}
-            </motion.div>
-            
-            <div className={`flex justify-center items-center ${isMobile ? 'gap-6' : 'gap-4 sm:gap-6'}`}>
-              <div className={`${isMobile ? 'w-12 h-12' : 'px-5 py-2.5'} bg-gray-300 animate-pulse rounded-full`}></div>
-              <div className="flex gap-2">
-                {Array.from({ length: 3 }, (_, i) => (
-                  <div key={i} className={`${isMobile ? 'w-4 h-4' : 'w-3 h-3'} bg-gray-300 animate-pulse rounded-full`}></div>
-                ))}
-              </div>
-              <div className={`${isMobile ? 'w-12 h-12' : 'px-5 py-2.5'} bg-gray-300 animate-pulse rounded-full`}></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div 
