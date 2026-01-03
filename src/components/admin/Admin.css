@@ -1,0 +1,192 @@
+/* Admin Theme CSS - src/components/admin/Admin.css */
+
+:root {
+  --admin-bg: #f0f2f5;
+  --admin-card-bg: #ffffff;
+  --admin-primary-color: #0052cc;
+  --admin-primary-hover: #0041a3;
+  --admin-text-primary: #172b4d;
+  --admin-text-secondary: #5e6c84;
+  --admin-border-color: #dfe1e6;
+  --admin-error-color: #de350b;
+  --admin-success-color: #00875a;
+  --admin-disabled-bg: #f4f5f7;
+  --admin-disabled-text: #a5adba;
+}
+
+.admin-page-wrapper {
+  background-color: var(--admin-bg);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--admin-text-primary);
+}
+
+/* --- Login Page --- */
+.login-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.login-card {
+  background-color: var(--admin-card-bg);
+  padding: 2rem 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-card h2 {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  color: var(--admin-text-primary);
+}
+
+.login-card .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.login-card label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+}
+
+/* --- Page Editor --- */
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: var(--admin-card-bg);
+  border-bottom: 1px solid var(--admin-border-color);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.editor-header h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.editor-content {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.editor-section-card {
+  background-color: var(--admin-card-bg);
+  border: 1px solid var(--admin-border-color);
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.editor-section-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 1rem 1.5rem;
+  background-color: #fafbfc;
+  border-bottom: 1px solid var(--admin-border-color);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.editor-section-card .form-group {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f0f2f5;
+}
+.editor-section-card .form-group:last-child {
+  border-bottom: none;
+}
+
+
+/* --- Shared Form Elements --- */
+.admin-input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--admin-border-color);
+  border-radius: 4px;
+  background-color: var(--admin-card-bg);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin-input:focus {
+  outline: none;
+  border-color: var(--admin-primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.2);
+}
+
+.admin-button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--admin-primary-color);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-button:hover {
+  background-color: var(--admin-primary-hover);
+}
+
+.admin-button:disabled {
+  background-color: var(--admin-disabled-bg);
+  color: var(--admin-disabled-text);
+  cursor: not-allowed;
+}
+
+/* --- States & Feedback --- */
+.admin-error-message {
+  background-color: #ffebe6;
+  color: var(--admin-error-color);
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid var(--admin-error-color);
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-loading-container, .admin-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+  min-height: 50vh;
+}
+
+.admin-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 82, 204, 0.2);
+  border-left-color: var(--admin-primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
