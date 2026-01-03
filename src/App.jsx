@@ -35,22 +35,22 @@ const AdminIndexPage = lazy(() => import('./components/admin/AdminIndexPage'));
 
 import { usePageData } from "./hooks/usePageData.js";
 
-const Home = ({ onModalStateChange, isVisible }) => {
-  const { pageData, loading, error } = usePageData('home');
+const Home = ({ pageData, loading, error, onModalStateChange, isVisible }) => {
 
   if (loading) {
-    // We can return a specific loader for the home content
-    return <div style={{minHeight: '100vh'}}>{/* Placeholder for loader */}</div>;
+    return <div className="min-h-screen flex items-center justify-center">Loading Home Content...</div>;
   }
 
   if (error) {
-    return <div style={{minHeight: '100vh', padding: '4rem', textAlign: 'center'}}>Could not load page content.</div>;
+    return <div className="min-h-screen flex items-center justify-center text-red-500">Error loading home content.</div>;
   }
 
   // Find the specific sections from the fetched data
   const heroContent = pageData?.sections.find(s => s.type === 'hero')?.content;
   const tentangKamiContent = pageData?.sections.find(s => s.type === 'tentangKami')?.content;
   const leadershipHistoryContent = pageData?.sections.find(s => s.type === 'leadershipHistory')?.content;
+  const achievementsContent = pageData?.sections.find(s => s.type === 'achievements')?.content;
+  // Add more content extractions as needed for other components used in Home.
 
   return (
     <div className="relative">
@@ -61,6 +61,7 @@ const Home = ({ onModalStateChange, isVisible }) => {
       />}
       {tentangKamiContent && <TentangKami data={tentangKamiContent} isVisible={isVisible} />}
       {leadershipHistoryContent && <LeadershipHistory data={leadershipHistoryContent} isVisible={isVisible} />}
+      {achievementsContent && <Achievements data={achievementsContent} />}
     </div>
   );
 };
@@ -210,16 +211,23 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+import { usePageData } from "./hooks/usePageData.js";
+
 const AppContent = () => {
   const { isVisible, isScrolled, refreshObserver } = useScrollAndAnimation();
   const location = useLocation();
-  
+
+  // --- NEW: Centralized Page Data Fetching ---
+  const slug = location.pathname === '/' ? 'home' : location.pathname.substring(1);
+  const { pageData, loading: pageLoading, error: pageError } = usePageData(slug);
+  // ---
+
   // MODAL STATE MANAGEMENT
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Loading State Management
   const [isPageLoading, setIsPageLoading] = useState(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(true); // Changed from useRef to useState
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const loadStartTime = useRef(null);
 
   // Effect for initial page load
@@ -228,24 +236,20 @@ const AppContent = () => {
     
     const handleInitialLoad = () => {
       const loadDuration = Date.now() - loadStartTime.current;
-      const minLoadTime = 600; // Reduced from 1000ms to 600ms for faster initial load
+      const minLoadTime = 600;
       const remainingTime = Math.max(0, minLoadTime - loadDuration);
 
       setTimeout(() => {
         setIsPageLoading(false);
-        setIsInitialLoad(false); // Changed from isInitialLoad.current = false
+        setIsInitialLoad(false);
       }, remainingTime);
     };
 
-    // Check if the document is already loaded
     if (document.readyState === 'complete') {
       handleInitialLoad();
     } else {
       window.addEventListener('load', handleInitialLoad, { once: true });
-      
-      // Fallback timeout in case load event doesn't fire
-      const fallbackTimeout = setTimeout(handleInitialLoad, 2000); // Reduced from 3000ms
-      
+      const fallbackTimeout = setTimeout(handleInitialLoad, 2000);
       return () => {
         window.removeEventListener('load', handleInitialLoad);
         clearTimeout(fallbackTimeout);
@@ -255,181 +259,71 @@ const AppContent = () => {
 
   // Effect for handling loading screen on route changes
   useEffect(() => {
-    // Don't run this on the initial load
-    if (isInitialLoad) {
-      return;
-    }
-
-    // Show loading screen
+    if (isInitialLoad) return;
     setIsPageLoading(true);
     loadStartTime.current = Date.now();
-
-    // Hide loading screen after a minimum display time
-    const minLoadTime = 500; // Reduced from 800ms to 500ms for snappier route changes
+    const minLoadTime = 500;
     const navigationLoadTimer = setTimeout(() => {
       setIsPageLoading(false);
     }, minLoadTime);
-
-    return () => {
-      clearTimeout(navigationLoadTimer);
-    };
+    return () => clearTimeout(navigationLoadTimer);
   }, [location.pathname, isInitialLoad]);
 
   useEffect(() => {
-    if (!isInitialLoad) {
-      refreshObserver();
-    }
+    if (!isInitialLoad) refreshObserver();
   }, [location.pathname, isInitialLoad, refreshObserver]);
 
-  // Determine if we should show full-screen loading
-  // Full screen when: initial load OR navigating to home page
   const isFullScreenLoading = isInitialLoad || location.pathname === "/";
-
-  // Handle modal state changes from Hero component
-  const handleModalStateChange = (modalState) => {
-    setIsModalOpen(modalState);
-  };
-
-  // Reset modal state when route changes
-  useEffect(() => {
-    setIsModalOpen(false);
-    
-    // Clear any ongoing animations or timeouts here if needed
-    return () => {
-      // Cleanup function
-    };
-  }, [location]);
-
-  const handleTouchStart = () => {
-    // Touch handlers can be added here if needed for global gestures
-  };
-
-  const handleTouchMove = () => {
-    // Touch handlers can be added here if needed for global gestures
-  };
-
-  const handleTouchEnd = () => {
-    // Touch handlers can be added here if needed for global gestures
-  };
+  const handleModalStateChange = (modalState) => setIsModalOpen(modalState);
+  useEffect(() => setIsModalOpen(false), [location]);
 
   return (
-    <div
-      className="relative min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
+    <div className="relative min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50">
       <LoadingScreen isLoading={isPageLoading} isInitialLoad={isFullScreenLoading} />
       <GlobalStyles />
       <ScrollToTop />
 
-      {/* Global Background Pattern */}
       <div className="fixed inset-0 pointer-events-none opacity-5">
         <div className="absolute inset-0 bg-gradient-to-br from-[#5c0b08]/5 via-[#903d04]/3 to-[#9c7502]/5"></div>
       </div>
 
-      {/* NAVIGATION WITH MODAL STATE */}
-      <Navigation 
-        isPageLoading={isPageLoading}
-        isInitialLoad={isFullScreenLoading}
-        isScrolled={isScrolled} 
-        isModalOpen={isModalOpen}
-      />
+      <Navigation isPageLoading={isPageLoading} isInitialLoad={isFullScreenLoading} isScrolled={isScrolled} isModalOpen={isModalOpen} />
 
-      {/* Main Content Area with Routes */}
       <main className={`relative z-10`}>
         <ErrorBoundary>
           <Suspense fallback={<LoadingScreen isLoading={true} isInitialLoad={isFullScreenLoading} />}>
             <AnimatePresence mode="wait">
               <Routes location={location} key={location.pathname}>
                 {/* ADMIN ROUTES */}
+                <Route path="/admin" element={<AdminIndexPage />} />
                 <Route path="/admin/login" element={<LoginPage />} />
-                <Route
-                  path="/admin/edit/:slug"
-                  element={
-                    <ProtectedRoute>
-                      <AdminPageEditor />
-                    </ProtectedRoute>
-                  }
-                />
+                <Route path="/admin/edit/:slug" element={<ProtectedRoute><AdminPageEditor /></ProtectedRoute>} />
 
                 {/* HOME ROUTE WITH MODAL STATE HANDLER */}
                 <Route 
                   path="/" 
-                  element={
-                    <Home onModalStateChange={handleModalStateChange} isVisible={isVisible} />
-                  } 
+                  element={ <Home pageData={pageData} loading={pageLoading} error={pageError} onModalStateChange={handleModalStateChange} isVisible={isVisible} /> } 
                 />
                 
-                {/* Regular routes with PageWrapper */}
-                <Route
-                  path="/tentang-kami"
-                  element={<RouteComponent Component={TentangKami} isVisible={isVisible} />}
-                />
-                <Route
-                  path="/foto-kegiatan"
-                  element={<RouteComponent Component={FotoKegiatan} isVisible={isVisible} />}
-                />
-                <Route
-                  path="/foto-purna-ambalan"
-                  element={<RouteComponent Component={FotoPurnaAmbalan} isVisible={isVisible} />}
-                />
-                <Route
-                  path="/seragam"
-                  element={<RouteComponent Component={SeragamPramuka} isVisible={isVisible} />}
-                />
-                <Route
-                  path="/materi-pramuka"
-                  element={<RouteComponent Component={MateriPramuka} isFullSize={true} isVisible={isVisible} />}
-                />
-                <Route
-                  path="/admin"
-                  element={<AdminIndexPage />}
-                />
-                
-                {/* Full-size routes (SVG, diagrams, charts, etc.) */}
-                <Route
-                  path="/struktur-organisasi"
-                  element={<RouteComponent Component={StrukturOrganisasi} isFullSize={true} isVisible={isVisible} />}
-                />
-                <Route
-                  path="/filosofi"
-                  element={<RouteComponent Component={Filosofi} isFullSize={true} isVisible={isVisible} />}
-                />
-                <Route
-                  path="/achievements"
-                  element={<RouteComponent Component={Achievements} isFullSize={true} isVisible={isVisible} />}
-                />
+                {/* Regular routes now receive pageData */}
+                <Route path="/tentang-kami" element={<RouteComponent Component={TentangKami} pageData={pageData} isVisible={isVisible} />} />
+                <Route path="/foto-kegiatan" element={<RouteComponent Component={FotoKegiatan} pageData={pageData} isVisible={isVisible} />} />
+                <Route path="/foto-purna-ambalan" element={<RouteComponent Component={FotoPurnaAmbalan} pageData={pageData} isVisible={isVisible} />} />
+                <Route path="/seragam" element={<RouteComponent Component={SeragamPramuka} pageData={pageData} isVisible={isVisible} />} />
+                <Route path="/materi-pramuka" element={<RouteComponent Component={MateriPramuka} pageData={pageData} isFullSize={true} isVisible={isVisible} />} />
+                <Route path="/struktur-organisasi" element={<RouteComponent Component={StrukturOrganisasi} pageData={pageData} isFullSize={true} isVisible={isVisible} />} />
+                <Route path="/filosofi" element={<RouteComponent Component={Filosofi} pageData={pageData} isFullSize={true} isVisible={isVisible} />} />
+                <Route path="/achievements" element={<RouteComponent Component={Achievements} pageData={pageData} isFullSize={true} isVisible={isVisible} />} />
                 
                 {/* 404 Route */}
-                <Route
-                  path="*"
-                  element={
-                    <PageWrapper>
-                      <div className="py-20 text-center">
-                        <h1 className="mb-4 text-4xl font-bold text-gray-600">
-                          404
-                        </h1>
-                        <p className="mb-8 text-gray-500">
-                          Halaman tidak ditemukan
-                        </p>
-                        <Link
-                          to="/"
-                          className="inline-block px-6 py-3 bg-gradient-to-r from-[#5c0b08] to-[#903d04] text-white rounded-lg hover:shadow-lg transition-all duration-300"
-                        >
-                          Kembali ke Beranda
-                        </Link>
-                      </div>
-                    </PageWrapper>
-                  }
-                />
+                <Route path="*" element={ <PageWrapper> <div className="py-20 text-center"> <h1 className="mb-4 text-4xl font-bold text-gray-600">404</h1> <p className="mb-8 text-gray-500">Halaman tidak ditemukan</p> <Link to="/" className="inline-block px-6 py-3 bg-gradient-to-r from-[#5c0b08] to-[#903d04] text-white rounded-lg hover:shadow-lg transition-all duration-300"> Kembali ke Beranda </Link> </div> </PageWrapper> } />
               </Routes>
             </AnimatePresence>
           </Suspense>
         </ErrorBoundary>
       </main>
 
-      <Footer />
+      <Footer pageData={pageData} />
     </div>
   );
 };

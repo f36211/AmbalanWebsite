@@ -42,6 +42,19 @@ export const usePageData = (slug) => {
         setError(null);
         const response = await axios.get(`/api/public-get-page?slug=${slug}`);
         setPageData(response.data);
+
+        // After fetching, try to increment the view count
+        const viewKey = `viewed-${slug}`;
+        if (!sessionStorage.getItem(viewKey)) {
+          try {
+            await axios.post('/api/public-increment-view', { slug });
+            sessionStorage.setItem(viewKey, 'true');
+          } catch (incrementError) {
+            // Log the error but don't block the user from seeing the page
+            console.error('Failed to increment view count:', incrementError);
+          }
+        }
+
       } catch (err) {
         console.error(`Failed to fetch page data for slug: ${slug}`, err);
         setError(err);
