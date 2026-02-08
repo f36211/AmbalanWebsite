@@ -13,7 +13,7 @@ import Hero from "./components/Hero/Hero";
 import LeadershipHistory from "./components/Hero/LeadershipHistory";
 import Footer from "./components/Hero/Footer";
 import GlobalStyles from "./components/Hero/GlobalStyles";
-import Breadcrumb from './components/ui/Breadcrumb';
+import Breadcrumb from "./components/ui/Breadcrumb";
 import AdminApp from "./components/admin/AdminApp";
 import Filosofi from "./components/filosofi.jsx";
 import Achievements from "./components/Achievements.jsx";
@@ -64,7 +64,7 @@ const useRouteVisibility = () => {
       {
         threshold: 0.1,
         rootMargin: "50px 0px -50px 0px",
-      }
+      },
     );
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -117,10 +117,7 @@ const Home = ({ onModalStateChange }) => {
 
   return (
     <div className="relative">
-      <Hero 
-        isVisible={isVisible} 
-        onModalStateChange={onModalStateChange}
-      />
+      <Hero isVisible={isVisible} onModalStateChange={onModalStateChange} />
       <TentangKami isVisible={isVisible} />
       <LeadershipHistory isVisible={isVisible} />
     </div>
@@ -130,7 +127,7 @@ const Home = ({ onModalStateChange }) => {
 // Wrapper component for individual route pages
 const PageWrapper = ({ children }) => {
   const location = useLocation();
-  const isHomePage = location.pathname === '/';
+  const isHomePage = location.pathname === "/";
 
   return (
     <div className="pt-20 min-h-screen relative">
@@ -144,11 +141,7 @@ const PageWrapper = ({ children }) => {
 
 // Full-size wrapper for SVG or full-screen components (no padding, no container)
 const FullSizeWrapper = ({ children }) => {
-  return (
-    <div className="pt-10 min-h-screen relative w-full">
-      {children}
-    </div>
-  );
+  return <div className="pt-10 min-h-screen relative w-full">{children}</div>;
 };
 
 // Component to handle scroll reset on route change
@@ -228,7 +221,7 @@ const RouteComponent = ({ Component, isFullSize = false }) => {
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
   static getDerivedStateFromError(error) {
@@ -237,30 +230,100 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error("Error caught by boundary:", error, errorInfo);
+    this.setState({ errorInfo });
   }
+
+  handleCopyError = () => {
+    const errorText = `Error: ${this.state.error?.toString()}\n\nStack Trace:\n${this.state.errorInfo?.componentStack}`;
+    navigator.clipboard
+      .writeText(errorText)
+      .then(() => {
+        alert("Error details copied to clipboard!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy error: ", err);
+      });
+  };
+
+  handleReload = () => {
+    // Clear caches if possible (standard reload usually sufficient)
+    window.location.reload();
+  };
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-white to-orange-50">
-          <div className="text-center p-8">
-            <img 
-              src="/images/logo/LogoTransparant.webp" 
-              alt="Error Illustration" 
-              className="w-64 h-64 mx-auto mb-8" 
-            />
-            <h1 className="text-2xl font-bold text-red-600 mb-4">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-white to-orange-50 p-4">
+          <div className="text-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-orange-100 max-w-lg w-full">
+            <div className="mb-6 relative">
+              <div className="absolute inset-0 bg-red-100 rounded-full w-24 h-24 mx-auto animate-pulse opacity-50"></div>
+              <img
+                src="/images/logo/LogoTransparant.webp"
+                alt="Error Illustration"
+                className="w-24 h-24 mx-auto relative z-10 object-contain drop-shadow-md"
+              />
+            </div>
+
+            <h1 className="text-2xl font-bold text-red-600 mb-2">
               Oops! Something went wrong.
             </h1>
-            <p className="text-gray-600 mb-4">
-              We're sorry, but it seems like there's a technical issue. Please try again later.
+            <p className="text-gray-600 mb-6 text-sm">
+              We're sorry, but an unexpected error occurred.
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            >
-              Reload Page
-            </button>
+
+            <div className="flex flex-col gap-3 justify-center sm:flex-row">
+              <button
+                onClick={this.handleReload}
+                className="px-6 py-2.5 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-lg hover:shadow-lg hover:from-orange-700 hover:to-red-700 transition-all duration-300 font-medium text-sm flex items-center justify-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                Reload Page
+              </button>
+
+              <button
+                onClick={this.handleCopyError}
+                className="px-6 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 font-medium text-sm flex items-center justify-center gap-2"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
+                  />
+                </svg>
+                Copy Error Details
+              </button>
+            </div>
+
+            {/* Optional: Show error message in dev mode or behind a toggle */}
+            <details className="mt-8 text-left border-t pt-4">
+              <summary className="text-xs text-gray-400 cursor-pointer hover:text-gray-600 transition-colors list-none text-center">
+                Show technical details
+              </summary>
+              <div className="mt-2 p-3 bg-gray-50 rounded text-xs text-mono text-red-800 overflow-auto max-h-40 whitespace-pre-wrap border border-red-100">
+                {this.state.error && this.state.error.toString()}
+              </div>
+            </details>
           </div>
         </div>
       );
@@ -273,7 +336,7 @@ class ErrorBoundary extends React.Component {
 const AppContent = () => {
   const { isScrolled } = useScrollAndAnimation();
   const location = useLocation();
-  
+
   // MODAL STATE MANAGEMENT
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -285,7 +348,7 @@ const AppContent = () => {
   // Effect for initial page load
   useEffect(() => {
     loadStartTime.current = Date.now();
-    
+
     const handleInitialLoad = () => {
       const loadDuration = Date.now() - loadStartTime.current;
       const minLoadTime = 600; // Reduced from 1000ms to 600ms for faster initial load
@@ -298,16 +361,16 @@ const AppContent = () => {
     };
 
     // Check if the document is already loaded
-    if (document.readyState === 'complete') {
+    if (document.readyState === "complete") {
       handleInitialLoad();
     } else {
-      window.addEventListener('load', handleInitialLoad, { once: true });
-      
+      window.addEventListener("load", handleInitialLoad, { once: true });
+
       // Fallback timeout in case load event doesn't fire
       const fallbackTimeout = setTimeout(handleInitialLoad, 2000); // Reduced from 3000ms
-      
+
       return () => {
-        window.removeEventListener('load', handleInitialLoad);
+        window.removeEventListener("load", handleInitialLoad);
         clearTimeout(fallbackTimeout);
       };
     }
@@ -347,7 +410,7 @@ const AppContent = () => {
   // Reset modal state when route changes
   useEffect(() => {
     setIsModalOpen(false);
-    
+
     // Clear any ongoing animations or timeouts here if needed
     return () => {
       // Cleanup function
@@ -373,7 +436,10 @@ const AppContent = () => {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <LoadingScreen isLoading={isPageLoading} isInitialLoad={isFullScreenLoading} />
+      <LoadingScreen
+        isLoading={isPageLoading}
+        isInitialLoad={isFullScreenLoading}
+      />
       <GlobalStyles />
       <ScrollToTop />
 
@@ -383,10 +449,10 @@ const AppContent = () => {
       </div>
 
       {/* NAVIGATION WITH MODAL STATE */}
-      <Navigation 
+      <Navigation
         isPageLoading={isPageLoading}
         isInitialLoad={isFullScreenLoading}
-        isScrolled={isScrolled} 
+        isScrolled={isScrolled}
         isModalOpen={isModalOpen}
       />
 
@@ -396,13 +462,11 @@ const AppContent = () => {
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>
               {/* HOME ROUTE WITH MODAL STATE HANDLER */}
-              <Route 
-                path="/" 
-                element={
-                  <Home onModalStateChange={handleModalStateChange} />
-                } 
+              <Route
+                path="/"
+                element={<Home onModalStateChange={handleModalStateChange} />}
               />
-              
+
               {/* Regular routes with PageWrapper */}
               <Route
                 path="/tentang-kami"
@@ -422,27 +486,38 @@ const AppContent = () => {
               />
               <Route
                 path="/materi-pramuka"
-                element={<RouteComponent Component={MateriPramuka} isFullSize={true} />}
+                element={
+                  <RouteComponent Component={MateriPramuka} isFullSize={true} />
+                }
               />
               <Route
                 path="/admin"
                 element={<RouteComponent Component={AdminApp} />}
               />
-              
+
               {/* Full-size routes (SVG, diagrams, charts, etc.) */}
               <Route
                 path="/struktur-organisasi"
-                element={<RouteComponent Component={StrukturOrganisasi} isFullSize={true} />}
+                element={
+                  <RouteComponent
+                    Component={StrukturOrganisasi}
+                    isFullSize={true}
+                  />
+                }
               />
               <Route
                 path="/filosofi"
-                element={<RouteComponent Component={Filosofi} isFullSize={true} />}
+                element={
+                  <RouteComponent Component={Filosofi} isFullSize={true} />
+                }
               />
               <Route
                 path="/achievements"
-                element={<RouteComponent Component={Achievements} isFullSize={true} />}
+                element={
+                  <RouteComponent Component={Achievements} isFullSize={true} />
+                }
               />
-              
+
               {/* 404 Route */}
               <Route
                 path="*"

@@ -1,323 +1,205 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Calendar, Award, Star, Medal, Target } from 'lucide-react';
-import { achievementsData } from '../data/achievementsData';
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Trophy, Calendar, Award, Star, Medal, Target } from "lucide-react";
+import { achievementsData as fallbackData } from "../data/achievementsData";
+import { client, urlFor } from "../sanity/client";
 
-const AchievementBadges = () => {
-  const [selectedAchievement, setSelectedAchievement] = useState(null);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+const AchievementCard = ({ achievement, index, onClick }) => {
+  const IconComponent = [Trophy, Award, Star, Medal, Target][index % 5];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const badgeVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 50,
-      scale: 0.8
-    },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      scale: 1,
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 20
-      }
-    }
-  };
-
-  const getRandomIcon = (index) => {
-    const icons = [Trophy, Award, Star, Medal, Target];
-    return icons[index % icons.length];
-  };
+  // Handle image URL from Sanity 'image' type or legacy 'url' type
+  const imageUrl = achievement.badgeImage
+    ? urlFor(achievement.badgeImage).url()
+    : achievement.badgeUrl || null;
 
   return (
-    <>
-      <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8 lg:gap-12"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {achievementsData.map((achievement, index) => {
-          const IconComponent = getRandomIcon(index);
-          
-          return (
-            <motion.div
-              key={index}
-              className="relative group cursor-pointer"
-              variants={badgeVariants}
-              whileHover={{ 
-                scale: 1.05,
-                y: -8,
-                transition: { type: 'spring', stiffness: 400, damping: 25 }
+    <motion.div
+      layoutId={`card-${index}`}
+      onClick={() => onClick(achievement)}
+      className="group relative bg-white rounded-2xl p-6 shadow-md hover:shadow-xl border border-orange-100 transition-all duration-300 cursor-pointer overflow-hidden"
+      whileHover={{ y: -5 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+    >
+      {/* Decorative gradient blob */}
+      <div className="absolute -top-10 -right-10 w-32 h-32 bg-gradient-to-br from-amber-50 to-orange-100 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-500" />
+
+      <div className="relative z-10 flex flex-col items-center text-center">
+        {/* Icon/Image Container */}
+        <div className="w-20 h-20 mb-4 rounded-full bg-gradient-to-br from-amber-50 via-white to-orange-50 shadow-inner flex items-center justify-center border border-orange-100 group-hover:border-orange-200 transition-colors">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={achievement.title}
+              className="w-full h-full object-cover rounded-full p-1"
+              onError={(e) => {
+                e.target.style.display = "none";
               }}
-              onHoverStart={() => setHoveredIndex(index)}
-              onHoverEnd={() => setHoveredIndex(null)}
-              onClick={() => setSelectedAchievement(achievement)}
-            >
-              {/* Main Badge Container */}
-              <div className="relative">
-                {/* Glow Effect */}
-                <motion.div
-                  className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400/20 via-orange-500/20 to-red-500/20 blur-xl"
-                  animate={{
-                    scale: hoveredIndex === index ? 1.2 : 0.8,
-                    opacity: hoveredIndex === index ? 0.6 : 0
-                  }}
-                  transition={{ duration: 0.3 }}
-                />
+            />
+          ) : (
+            <IconComponent className="w-8 h-8 text-[#903d04]" />
+          )}
+        </div>
 
-                {/* Badge Background */}
-                <motion.div
-                  className="relative w-36 h-36 mx-auto rounded-full bg-gradient-to-br from-amber-100 via-white to-orange-50 shadow-2xl border-4 border-gradient-to-r from-yellow-400 to-orange-500"
-                  style={{
-                    background: `linear-gradient(135deg, 
-                      rgba(251, 191, 36, 0.1) 0%, 
-                      rgba(255, 255, 255, 0.9) 50%, 
-                      rgba(249, 115, 22, 0.1) 100%)`
-                  }}
-                >
-                  {/* Border Gradient Effect */}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 p-1">
-                    <div className="w-full h-full rounded-full bg-white" />
-                  </div>
+        <h3 className="font-bold text-lg text-[#5c0b08] mb-2 line-clamp-2 group-hover:text-[#903d04] transition-colors">
+          {achievement.title}
+        </h3>
 
-                  {/* Badge Image */}
-                  <div className="absolute inset-2 rounded-full overflow-hidden">
-                    <img
-                      src={achievement.badgeUrl}
-                      alt={achievement.title}
-                      className="w-full h-full object-cover rounded-full"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'flex';
-                      }}
-                    />
-                    {/* Fallback Icon */}
-                    <div className="hidden w-full h-full items-center justify-center bg-gradient-to-br from-amber-500 to-orange-600 rounded-full">
-                      <IconComponent className="w-12 h-12 text-white" />
-                    </div>
-                  </div>
+        <div className="flex items-center gap-2 text-sm font-medium text-amber-700/80 mb-3">
+          <Calendar className="w-4 h-4" />
+          <span>{achievement.year}</span>
+        </div>
 
-                  {/* Shine Effect */}
-                  <motion.div
-                    className="absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    animate={{
-                      x: hoveredIndex === index ? ['-100%', '200%'] : '-100%'
-                    }}
-                    transition={{
-                      duration: 0.6,
-                      ease: "easeInOut"
-                    }}
-                    style={{
-                      background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)'
-                    }}
-                  />
-                </motion.div>
+        <p className="text-gray-600 text-sm line-clamp-3 leading-relaxed">
+          {achievement.description}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
 
-                {/* Achievement Info */}
-                <motion.div
-                  className="mt-6 text-center"
-                  animate={{
-                    y: hoveredIndex === index ? -5 : 0
-                  }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <h3 className="font-bold text-lg text-gray-800 mb-2 leading-tight">
-                    {achievement.title}
-                  </h3>
-                  <div className="flex items-center justify-center gap-1 text-amber-600 mb-2">
-                    <Calendar className="w-4 h-4" />
-                    <span className="text-sm font-medium">{achievement.year}</span>
-                  </div>
-                  <p className="text-sm text-gray-600 leading-relaxed px-2">
-                    {achievement.description?.length > 60 
-                      ? `${achievement.description.substring(0, 60)}...`
-                      : achievement.description
-                    }
-                  </p>
-                </motion.div>
+const AchievementModal = ({ achievement, onClose }) => {
+  if (!achievement) return null;
 
-                {/* Floating Particles Effect */}
-                {hoveredIndex === index && (
-                  <div className="absolute inset-0 pointer-events-none">
-                    {[...Array(6)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute w-2 h-2 bg-yellow-400 rounded-full"
-                        initial={{ 
-                          x: Math.random() * 200 - 100,
-                          y: Math.random() * 200 - 100,
-                          opacity: 0 
-                        }}
-                        animate={{ 
-                          y: -200,
-                          opacity: [0, 1, 0],
-                          scale: [0.5, 1, 0]
-                        }}
-                        transition={{ 
-                          duration: 2,
-                          delay: i * 0.2,
-                          repeat: Infinity
-                        }}
-                        style={{
-                          left: `${20 + (i * 15)}%`,
-                          top: '50%'
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+  const imageUrl = achievement.badgeImage
+    ? urlFor(achievement.badgeImage).url()
+    : achievement.badgeUrl || null;
 
-      {/* Achievement Detail Modal */}
-      <AnimatePresence>
-        {selectedAchievement && (
-          <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedAchievement(null)}
+  return (
+    <motion.div
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[10000] p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        layoutId={`card-${achievement.index}`}
+        className="bg-white rounded-3xl p-8 max-w-lg w-full shadow-2xl relative overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+      >
+        {/* Background Pattern */}
+        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-[#5c0b08] to-[#903d04] opacity-10" />
+
+        <div className="relative z-10 flex flex-col items-center text-center mt-4">
+          <div className="w-32 h-32 mb-6 rounded-full bg-white p-2 shadow-xl border-4 border-orange-50">
+            <img
+              src={
+                imageUrl || "https://via.placeholder.com/150?text=Achievement"
+              }
+              alt={achievement.title}
+              className="w-full h-full object-cover rounded-full"
+              onError={(e) => {
+                e.target.src =
+                  "https://via.placeholder.com/150?text=Achievement";
+              }}
+            />
+          </div>
+
+          <h2 className="text-2xl md:text-3xl font-bold text-[#5c0b08] mb-3">
+            {achievement.title}
+          </h2>
+
+          <div className="flex items-center gap-2 text-amber-700 font-semibold mb-6 bg-amber-50 px-4 py-1.5 rounded-full">
+            <Calendar className="w-5 h-5" />
+            <span>{achievement.year}</span>
+          </div>
+
+          <p className="text-gray-600 leading-relaxed text-lg mb-8">
+            {achievement.description}
+          </p>
+
+          <button
+            onClick={onClose}
+            className="px-8 py-3 bg-gradient-to-r from-[#5c0b08] to-[#903d04] text-white rounded-xl hover:shadow-lg hover:shadow-orange-900/20 transition-all duration-300 font-semibold w-full sm:w-auto transform hover:-translate-y-0.5"
           >
-            <motion.div
-              className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl"
-              initial={{ scale: 0.8, opacity: 0, y: 50 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0, y: 50 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="text-center">
-                <div className="w-24 h-24 mx-auto mb-4 relative">
-                  <img
-                    src={selectedAchievement.badgeUrl}
-                    alt={selectedAchievement.title}
-                    className="w-full h-full object-cover rounded-full border-4 border-amber-400"
-                  />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                  {selectedAchievement.title}
-                </h3>
-                <div className="flex items-center justify-center gap-2 text-amber-600 mb-4">
-                  <Calendar className="w-5 h-5" />
-                  <span className="font-medium">{selectedAchievement.year}</span>
-                </div>
-                <p className="text-gray-600 leading-relaxed mb-6">
-                  {selectedAchievement.description}
-                </p>
-                <button
-                  onClick={() => setSelectedAchievement(null)}
-                  className="px-6 py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 font-medium"
-                >
-                  Close
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+            Tutup
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
 const Achievements = ({ isVisible = {} }) => {
-  const headerVariants = {
-    hidden: { opacity: 0, y: -50 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut"
+  const [selectedAchievement, setSelectedAchievement] = useState(null);
+  const [achievements, setAchievements] = useState(fallbackData);
+
+  useEffect(() => {
+    // Fetch from Sanity or fallback
+    const getAchievements = async () => {
+      try {
+        const query = `*[_type == "achievement"] | order(year desc)`;
+        // If client is configured (has token/ID), this works. Else returns fallback.
+        if (client) {
+          const data = await client.fetch(query);
+          if (data && data.length > 0) {
+            // Add index property to match local data shape if needed for layout keys
+            setAchievements(data.map((item, idx) => ({ ...item, index: idx })));
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch achievements:", error);
       }
-    }
-  };
+    };
+
+    getAchievements();
+  }, []);
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Simple Background Decorations */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Floating Trophy Icons */}
-        {[...Array(3)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute opacity-5"
-            animate={{
-              y: [0, -20, 0],
-              rotate: [0, 5, -5, 0]
-            }}
-            transition={{
-              duration: 4 + i,
-              repeat: Infinity,
-              delay: i * 0.5
-            }}
-            style={{
-              left: `${15 + i * 30}%`,
-              top: `${25 + i * 20}%`
-            }}
+    <section className="min-h-screen bg-white py-12 sm:py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header - Matching TentangKami styling */}
+        <div className="text-center mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#5c0b08] mb-4"
           >
-            <Trophy className="w-12 h-12 text-gray-300" />
-          </motion.div>
-        ))}
+            Prestasi Kami
+          </motion.h2>
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: 96 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="h-1 bg-gradient-to-r from-[#903d04] to-[#9c7502] mx-auto rounded-full"
+          />
+          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
+            Jejak langkah keberhasilan dan dedikasi Ambalan dalam mengukir
+            prestasi
+          </p>
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <AnimatePresence>
+            {achievements.map((achievement, index) => (
+              <AchievementCard
+                key={achievement._id || index}
+                index={index}
+                achievement={achievement}
+                onClick={setSelectedAchievement}
+              />
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
 
-      <div className="relative container mx-auto px-4 py-16 lg:py-24">
-        {/* Header Section */}
-        <motion.div
-          className="text-center mb-16"
-          variants={headerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-gray-800 mb-6">
-            Our Achievements
-          </h1>
-
-        </motion.div>
-
-        {/* Stats Section */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-        >
-          {[
-            { number: achievementsData?.length || '10+', label: 'Total Achievements', icon: Trophy },
-            { number: '5+', label: 'Years of Excellence', icon: Calendar },
-            { number: '50+', label: 'Awards Won', icon: Medal }
-          ].map((stat, index) => (
-            <motion.div
-              key={index}
-              className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20"
-              whileHover={{ y: -5, scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <stat.icon className="w-12 h-12 text-amber-600 mx-auto mb-3" />
-              <div className="text-3xl font-bold text-gray-800 mb-1">{stat.number}</div>
-              <div className="text-gray-600 font-medium">{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Achievement Badges */}
-        <AchievementBadges />
-      </div>
-    </div>
+      {/* Modal */}
+      <AnimatePresence>
+        {selectedAchievement && (
+          <AchievementModal
+            achievement={selectedAchievement}
+            onClose={() => setSelectedAchievement(null)}
+          />
+        )}
+      </AnimatePresence>
+    </section>
   );
 };
 

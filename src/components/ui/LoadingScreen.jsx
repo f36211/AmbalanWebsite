@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const funMessages = [
   "Memasang tenda... ⛺",
@@ -15,24 +15,24 @@ const LoadingScreen = ({ isLoading, isInitialLoad = false }) => {
   const [videoError, setVideoError] = useState(false);
   const [currentMessage, setCurrentMessage] = useState(funMessages[0]);
   const [videoLoaded, setVideoLoaded] = useState(false);
-  const [videoSource, setVideoSource] = useState('webm'); // 'webm', 'mp4', or 'fallback'
+  const [videoSource, setVideoSource] = useState("webm"); // 'webm', 'mp4', or 'fallback'
   const loadStartTime = useRef(null);
   const hideTimeoutRef = useRef(null);
   const hasStartedExit = useRef(false);
 
   const handleVideoError = () => {
     console.error(`Loading screen video failed to load (${videoSource})`);
-    
+
     // Try MP4 if WebM failed
-    if (videoSource === 'webm') {
+    if (videoSource === "webm") {
       console.log("Trying MP4 format...");
-      setVideoSource('mp4');
+      setVideoSource("mp4");
       setVideoLoaded(false);
-    } 
+    }
     // Use fallback animation if MP4 also failed
-    else if (videoSource === 'mp4') {
+    else if (videoSource === "mp4") {
       console.log("Using fallback animation...");
-      setVideoSource('fallback');
+      setVideoSource("fallback");
       setVideoError(true);
     }
   };
@@ -46,15 +46,15 @@ const LoadingScreen = ({ isLoading, isInitialLoad = false }) => {
   // Effect for cycling fun messages
   useEffect(() => {
     if (!visible) return;
-    
+
     const messageInterval = setInterval(() => {
-      setCurrentMessage(prev => {
+      setCurrentMessage((prev) => {
         const currentIndex = funMessages.indexOf(prev);
         const nextIndex = (currentIndex + 1) % funMessages.length;
         return funMessages[nextIndex];
       });
     }, 2000);
-    
+
     return () => clearInterval(messageInterval);
   }, [visible]);
 
@@ -68,19 +68,43 @@ const LoadingScreen = ({ isLoading, isInitialLoad = false }) => {
       hideTimeoutRef.current = null;
     }
 
+    // Helper: Safely set playback rate with browser limits
+    const safeSetPlaybackRate = (rate) => {
+      if (!video) return;
+      try {
+        // Clamp to browser limits (Chrome max is 16x)
+        const SAFE_MAX = 16;
+        const clampedRate = Math.min(rate, SAFE_MAX);
+        video.playbackRate = clampedRate;
+        return clampedRate;
+      } catch (e) {
+        console.warn("Failed to set playback rate:", e);
+        // Fallback to safe 1x if specific rate fails
+        try {
+          video.playbackRate = 1;
+        } catch (e) {}
+        return 1;
+      }
+    };
+
     if (isLoading) {
       // Show loading screen
       setVisible(true);
       hasStartedExit.current = false;
       loadStartTime.current = Date.now();
-      
-      if (video && videoSource !== 'fallback') {
-        video.playbackRate = 1.5; // Play slightly faster for snappier feel
+
+      if (video && videoSource !== "fallback") {
+        safeSetPlaybackRate(1.5); // Using helper
         video.loop = true;
-        video.play().catch(err => {
-          console.error("Video play failed:", err);
-          handleVideoError();
-        });
+
+        // Play with robust error handling
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.error("Video play failed:", err);
+            handleVideoError();
+          });
+        }
       }
     } else {
       // Prevent multiple exit sequences
@@ -88,48 +112,69 @@ const LoadingScreen = ({ isLoading, isInitialLoad = false }) => {
       hasStartedExit.current = true;
 
       // Loading complete - start exit sequence
-      const loadDuration = loadStartTime.current 
-        ? Date.now() - loadStartTime.current 
+      const loadDuration = loadStartTime.current
+        ? Date.now() - loadStartTime.current
         : 0;
 
       // Very short minimum display time for faster perceived load
       const minDisplayTime = 300; // Just 300ms minimum
       const remainingTime = Math.max(0, minDisplayTime - loadDuration);
 
-      if (video && videoSource !== 'fallback' && videoLoaded) {
+      if (video && videoSource !== "fallback" && videoLoaded) {
         // STOP LOOPING immediately
         video.loop = false;
-        
+
         // Calculate playback rate for RAPID exit
         const videoDuration = video.duration || 2;
         const currentTime = video.currentTime || 0;
-        const timeLeft = videoDuration - currentTime;
-        
-        // Aggressive speedup - aim to finish in 200-400ms max
-        const targetExitTime = Math.min(0.4, Math.max(0.2, remainingTime / 1000));
-        const calculatedRate = timeLeft / targetExitTime;
-        
-        // Speed up video dramatically (4x to 20x)
-        video.playbackRate = Math.min(20, Math.max(4, calculatedRate));
+        const timeLeft = Math.max(0, videoDuration - currentTime); // Ensure positive
 
-        console.log(`Exit speed: ${video.playbackRate.toFixed(1)}x, will finish in ~${(timeLeft / video.playbackRate * 1000).toFixed(0)}ms`);
+        // Aggressive speedup - aim to finish in 200-400ms max
+        const targetExitTime = Math.min(
+          0.4,
+          Math.max(0.2, remainingTime / 1000),
+        );
+
+        // Avoid division by zero
+        const calculatedRate =
+          targetExitTime > 0 ? timeLeft / targetExitTime : 16;
+
+        // Speed up video dramatically (4x to 16x max for Chrome safety)
+        const intendedRate = Math.max(4, calculatedRate);
+        const actualRate = safeSetPlaybackRate(intendedRate);
+
+        console.log(
+          `Exit speed: ${actualRate.toFixed(1)}x, will finish in ~${((timeLeft / actualRate) * 1000).toFixed(0)}ms`,
+        );
 
         // Hide when video ends
         const handleEnded = () => {
-          setVisible(false);
+          // Check if component is still mounted/relevant before update
+          if (hasStartedExit.current) {
+            setVisible(false);
+          }
         };
 
-        video.addEventListener('ended', handleEnded, { once: true });
-        
+        // Use 'once' listener to cleanup automatically
+        video.addEventListener("ended", handleEnded, { once: true });
+
+        // Check if video already ended (edge case)
+        if (video.ended) {
+          handleEnded();
+        }
+
         // Very short fallback timeout - force hide if video doesn't end quickly
-        const maxWaitTime = Math.max(remainingTime, 400); // Max 400ms wait
+        // Increased slightly to account for slower playback fallback
+        const maxWaitTime = Math.max(remainingTime, 600);
         hideTimeoutRef.current = setTimeout(() => {
           console.log("Force hiding loading screen (timeout)");
           setVisible(false);
+          // Explicitly remove listener to be safe
+          video.removeEventListener("ended", handleEnded);
         }, maxWaitTime);
 
         return () => {
-          video.removeEventListener('ended', handleEnded);
+          video.removeEventListener("ended", handleEnded);
           if (hideTimeoutRef.current) {
             clearTimeout(hideTimeoutRef.current);
           }
@@ -164,21 +209,25 @@ const LoadingScreen = ({ isLoading, isInitialLoad = false }) => {
       {visible && (
         <motion.div
           className={`fixed flex flex-col items-center justify-center bg-white ${
-            isInitialLoad 
-              ? 'inset-0 z-[10000]' 
-              : 'left-0 right-0 bottom-0 top-[80px] z-[9998]'
+            isInitialLoad
+              ? "inset-0 z-[10000]"
+              : "left-0 right-0 bottom-0 top-[80px] z-[9998]"
           }`}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25, ease: "easeOut" }}
         >
-          {videoSource === 'fallback' ? (
+          {videoSource === "fallback" ? (
             // Fallback animation when both video formats fail
             <div className="w-[300px] max-w-[80%] h-[300px] mb-4 flex items-center justify-center">
-              <motion.div 
+              <motion.div
                 className="text-6xl"
                 animate={{ y: [0, -20, 0] }}
-                transition={{ duration: 0.6, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  duration: 0.6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               >
                 ⛺
               </motion.div>
@@ -197,15 +246,15 @@ const LoadingScreen = ({ isLoading, isInitialLoad = false }) => {
               onCanPlay={handleVideoLoaded}
               key={videoSource} // Force re-render when source changes
             >
-              {videoSource === 'webm' ? (
+              {videoSource === "webm" ? (
                 <source src="/walking.webm" type="video/webm" />
               ) : (
                 <source src="/walking.mp4" type="video/mp4" />
               )}
             </video>
           )}
-          
-          <motion.p 
+
+          <motion.p
             className="text-[#555] font-sans text-lg font-bold tracking-wider"
             key={currentMessage}
             initial={{ opacity: 0, y: 10 }}

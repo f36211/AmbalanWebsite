@@ -1,16 +1,49 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { Camera, Calendar, MapPin, Users } from 'lucide-react';
-import { fotoKegiatanData } from '../data/index.js';
+import React, { useState, useMemo, useEffect } from "react";
+import { Camera, Calendar, MapPin, Users } from "lucide-react";
+import { fotoKegiatanData as fallbackData } from "../data/index.js";
+import { client, urlFor } from "../sanity/client";
 
 const FotoKegiatan = ({ isVisible = {} }) => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [cardVisible, setCardVisible] = useState({});
-  const { title, subtitle, categories, photos } = fotoKegiatanData;
+  // Use state for data to allow updates from Sanity
+  const [data, setData] = useState(fallbackData);
+  const { title, subtitle, categories } = data;
+  const [photos, setPhotos] = useState(fallbackData.photos);
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const query = `*[_type == "fotoKegiatan"] | order(date desc)`;
+        if (client) {
+          const result = await client.fetch(query);
+          if (result && result.length > 0) {
+            // Map Sanity data to component structure
+            const mappedPhotos = result.map((item) => ({
+              id: item._id,
+              title: item.title,
+              category: item.category,
+              date: item.date,
+              location: item.location,
+              participants: item.participants,
+              image: item.image
+                ? urlFor(item.image).url()
+                : "/images/placeholder.jpg",
+            }));
+            setPhotos(mappedPhotos);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch Foto Kegiatan:", error);
+      }
+    };
+    fetchPhotos();
+  }, []);
 
   const filteredPhotos = useMemo(() => {
-    return selectedCategory === 'all'
+    return selectedCategory === "all"
       ? photos
-      : photos.filter(photo => photo.category === selectedCategory);
+      : photos.filter((photo) => photo.category === selectedCategory);
   }, [selectedCategory, photos]);
 
   // Trigger card animation after filter change
@@ -18,7 +51,7 @@ const FotoKegiatan = ({ isVisible = {} }) => {
     const newVisibility = {};
     filteredPhotos.forEach((photo, index) => {
       setTimeout(() => {
-        setCardVisible(prev => ({ ...prev, [photo.id]: true }));
+        setCardVisible((prev) => ({ ...prev, [photo.id]: true }));
       }, index * 100);
     });
   }, [filteredPhotos]);
@@ -31,7 +64,9 @@ const FotoKegiatan = ({ isVisible = {} }) => {
           id="foto-header"
           data-animate
           className={`text-center mb-16 transform transition-all duration-1000 ${
-            isVisible['foto-header'] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            isVisible["foto-header"]
+              ? "translate-y-0 opacity-100"
+              : "translate-y-8 opacity-0"
           }`}
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-[#5c0b08] mb-4 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-[#5c0b08] hover:to-[#903d04] transition-all duration-500 cursor-default">
@@ -47,7 +82,9 @@ const FotoKegiatan = ({ isVisible = {} }) => {
             id="foto-filter"
             data-animate
             className={`mb-12 transform transition-all duration-1000 delay-200 ${
-              isVisible['foto-filter'] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+              isVisible["foto-filter"]
+                ? "translate-y-0 opacity-100"
+                : "translate-y-8 opacity-0"
             }`}
           >
             <div className="flex flex-wrap justify-center gap-4">
@@ -60,8 +97,8 @@ const FotoKegiatan = ({ isVisible = {} }) => {
                   }}
                   className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#903d04] ${
                     selectedCategory === category.id
-                      ? 'bg-gradient-to-r from-[#5c0b08] to-[#903d04] text-white shadow-lg scale-105'
-                      : 'bg-gray-100 text-[#5c0b08] hover:bg-gradient-to-r hover:from-[#903d04] hover:to-[#5c0b08] hover:text-white hover:scale-105'
+                      ? "bg-gradient-to-r from-[#5c0b08] to-[#903d04] text-white shadow-lg scale-105"
+                      : "bg-gray-100 text-[#5c0b08] hover:bg-gradient-to-r hover:from-[#903d04] hover:to-[#5c0b08] hover:text-white hover:scale-105"
                   }`}
                 >
                   {category.name}
@@ -75,10 +112,12 @@ const FotoKegiatan = ({ isVisible = {} }) => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredPhotos.map((photo, index) => (
             <div
-              key={photo.id}
+              key={photo.id || index}
               style={{ transitionDelay: `${index * 100}ms` }}
               className={`transform transition-all duration-1000 ${
-                cardVisible[photo.id] ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+                cardVisible[photo.id]
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-8 opacity-0"
               }`}
             >
               <article className="bg-white rounded-2xl shadow-lg overflow-hidden border border-orange-100 hover:shadow-2xl hover:scale-105 transition-all duration-300 group">
