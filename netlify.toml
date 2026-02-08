@@ -1,0 +1,17 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# Studio routing - only redirect when file doesn't exist
+[[redirects]]
+  from = "/studio/*"
+  to = "/studio/index.html"
+  status = 200
+  force = false
+
+# Main app routing - only redirect when file doesn't exist  
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
