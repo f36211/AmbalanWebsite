@@ -1,15 +1,15 @@
 [build]
   publish = "dist"
-  command = "npm run build"
+  command = "vite build"
 
-# Studio routing - only redirect when file doesn't exist
+# Proxy /studio to the Sanity-hosted studio
 [[redirects]]
   from = "/studio/*"
-  to = "/studio/index.html"
+  to = "https://ambalan.sanity.studio/:splat"
   status = 200
-  force = false
+  force = true
 
-# Main app routing - only redirect when file doesn't exist  
+# Main app routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
