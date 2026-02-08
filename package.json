@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && cd studio && npm install && npx sanity build ../dist/studio --base-path /studio",
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "nodemon server.js"

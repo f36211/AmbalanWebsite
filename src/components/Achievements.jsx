@@ -169,10 +169,6 @@ const Achievements = ({ isVisible = {} }) => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="h-1 bg-gradient-to-r from-[#903d04] to-[#9c7502] mx-auto rounded-full"
           />
-          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            Jejak langkah keberhasilan dan dedikasi Ambalan dalam mengukir
-            prestasi
-          </p>
         </div>
 
         {/* Grid */}
