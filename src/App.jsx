@@ -159,6 +159,7 @@ const ScrollToTop = () => {
 const RouteComponent = ({ Component, isFullSize = false }) => {
   const { isVisible } = useRouteVisibility();
   const [showContent, setShowContent] = useState(false);
+  const [enhancedVisibility, setEnhancedVisibility] = useState({});
 
   useEffect(() => {
     // Show content immediately, then let animations enhance the experience
@@ -169,15 +170,17 @@ const RouteComponent = ({ Component, isFullSize = false }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Create enhanced visibility that shows content by default
-  const enhancedVisibility = {};
-  const elements = document.querySelectorAll("[data-animate]");
-  elements.forEach((el) => {
-    if (el.id) {
-      // Show content if showContent is true OR if intersection observer detected it
-      enhancedVisibility[el.id] = showContent || isVisible[el.id] === true;
-    }
-  });
+  // Move DOM query into useEffect instead of running on every render
+  useEffect(() => {
+    const elements = document.querySelectorAll("[data-animate]");
+    const newVisibility = {};
+    elements.forEach((el) => {
+      if (el.id) {
+        newVisibility[el.id] = showContent || isVisible[el.id] === true;
+      }
+    });
+    setEnhancedVisibility(newVisibility);
+  }, [showContent, isVisible]);
 
   const pageVariants = {
     initial: {
@@ -260,6 +263,7 @@ class ErrorBoundary extends React.Component {
               <img
                 src="/images/logo/LogoTransparant.webp"
                 alt="Error Illustration"
+                loading="lazy"
                 className="w-24 h-24 mx-auto relative z-10 object-contain drop-shadow-md"
               />
             </div>
@@ -333,6 +337,20 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+// Route title mapping for dynamic document titles
+const routeTitles = {
+  "/": "Ambalan SMAIT Ummul Quro Bogor",
+  "/tentang-kami": "Tentang Kami | Ambalan SMAIT Ummul Quro",
+  "/foto-kegiatan": "Foto Kegiatan | Ambalan SMAIT Ummul Quro",
+  "/foto-purna-ambalan": "Foto Purna Ambalan | Ambalan SMAIT Ummul Quro",
+  "/seragam": "Seragam Pramuka | Ambalan SMAIT Ummul Quro",
+  "/materi-pramuka": "Materi Pramuka | Ambalan SMAIT Ummul Quro",
+  "/struktur-organisasi": "Struktur Organisasi | Ambalan SMAIT Ummul Quro",
+  "/filosofi": "Filosofi Logo | Ambalan SMAIT Ummul Quro",
+  "/achievements": "Prestasi | Ambalan SMAIT Ummul Quro",
+  "/admin": "Admin Panel | Ambalan SMAIT Ummul Quro",
+};
+
 const AppContent = () => {
   const { isScrolled } = useScrollAndAnimation();
   const location = useLocation();
@@ -340,34 +358,37 @@ const AppContent = () => {
   // MODAL STATE MANAGEMENT
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Loading State Management
+  // Loading State Management — only for initial page load, not route changes
   const [isPageLoading, setIsPageLoading] = useState(true);
-  const [isInitialLoad, setIsInitialLoad] = useState(true); // Changed from useRef to useState
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const loadStartTime = useRef(null);
 
-  // Effect for initial page load
+  // Dynamic document title based on route
+  useEffect(() => {
+    document.title = routeTitles[location.pathname] || "Ambalan SMAIT Ummul Quro Bogor";
+  }, [location.pathname]);
+
+  // Effect for initial page load only
   useEffect(() => {
     loadStartTime.current = Date.now();
 
     const handleInitialLoad = () => {
       const loadDuration = Date.now() - loadStartTime.current;
-      const minLoadTime = 600; // Reduced from 1000ms to 600ms for faster initial load
+      const minLoadTime = 600;
       const remainingTime = Math.max(0, minLoadTime - loadDuration);
 
       setTimeout(() => {
         setIsPageLoading(false);
-        setIsInitialLoad(false); // Changed from isInitialLoad.current = false
+        setIsInitialLoad(false);
       }, remainingTime);
     };
 
-    // Check if the document is already loaded
     if (document.readyState === "complete") {
       handleInitialLoad();
     } else {
       window.addEventListener("load", handleInitialLoad, { once: true });
 
-      // Fallback timeout in case load event doesn't fire
-      const fallbackTimeout = setTimeout(handleInitialLoad, 2000); // Reduced from 3000ms
+      const fallbackTimeout = setTimeout(handleInitialLoad, 2000);
 
       return () => {
         window.removeEventListener("load", handleInitialLoad);
@@ -376,31 +397,8 @@ const AppContent = () => {
     }
   }, []);
 
-  // Effect for handling loading screen on route changes
-  useEffect(() => {
-    // Don't run this on the initial load
-    if (isInitialLoad) {
-      return;
-    }
-
-    // Show loading screen
-    setIsPageLoading(true);
-    loadStartTime.current = Date.now();
-
-    // Hide loading screen after a minimum display time
-    const minLoadTime = 500; // Reduced from 800ms to 500ms for snappier route changes
-    const navigationLoadTimer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, minLoadTime);
-
-    return () => {
-      clearTimeout(navigationLoadTimer);
-    };
-  }, [location.pathname, isInitialLoad]);
-
-  // Determine if we should show full-screen loading
-  // Full screen when: initial load OR navigating to home page
-  const isFullScreenLoading = isInitialLoad || location.pathname === "/";
+  // Full screen loading only on initial load
+  const isFullScreenLoading = isInitialLoad;
 
   // Handle modal state changes from Hero component
   const handleModalStateChange = (modalState) => {
@@ -410,31 +408,11 @@ const AppContent = () => {
   // Reset modal state when route changes
   useEffect(() => {
     setIsModalOpen(false);
-
-    // Clear any ongoing animations or timeouts here if needed
-    return () => {
-      // Cleanup function
-    };
   }, [location]);
-
-  const handleTouchStart = (e) => {
-    // Touch handlers can be added here if needed for global gestures
-  };
-
-  const handleTouchMove = (e) => {
-    // Touch handlers can be added here if needed for global gestures
-  };
-
-  const handleTouchEnd = () => {
-    // Touch handlers can be added here if needed for global gestures
-  };
 
   return (
     <div
       className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 relative"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
       <LoadingScreen
         isLoading={isPageLoading}
@@ -457,7 +435,7 @@ const AppContent = () => {
       />
 
       {/* Main Content Area with Routes */}
-      <main className={`relative z-10`}>
+      <main id="main-content" className={`relative z-10`}>
         <ErrorBoundary>
           <AnimatePresence mode="wait">
             <Routes location={location} key={location.pathname}>

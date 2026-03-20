@@ -15,29 +15,9 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true, // Allow external connections
-    proxy: {
-      // Proxy API calls to Express.js server
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
-            console.log('proxy error', err);
-          });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('Sending Request to the Target:', req.method, req.url);
-          });
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
-          });
-        },
-      }
-    }
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
     rollupOptions: {
       output: {
         manualChunks: {

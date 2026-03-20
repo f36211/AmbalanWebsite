@@ -48,17 +48,20 @@ const Footer = () => {
             <img
               src={logos?.main || "/images/logo/L1.png"}
               alt="Logo Pramuka"
+              loading="lazy"
               className="w-10 h-10 sm:w-12 sm:h-12 object-contain hover:scale-110 hover:rotate-3 transition-all duration-300 active:scale-95"
             />
             <div className="flex gap-1 sm:gap-2">
               <img
                 src={logos?.putra || "/images/logo/L3.png"}
                 alt="Logo Putra"
+                loading="lazy"
                 className="w-8 h-8 sm:w-10 sm:h-10 object-contain hover:scale-110 hover:rotate-6 transition-all duration-300 active:scale-95"
               />
               <img
                 src={logos?.putri || "/images/logo/L2.png"}
                 alt="Logo Putri"
+                loading="lazy"
                 className="w-8 h-8 sm:w-10 sm:h-10 object-contain hover:scale-110 hover:-rotate-6 transition-all duration-300 active:scale-95"
               />
             </div>

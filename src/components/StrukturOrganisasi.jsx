@@ -350,7 +350,7 @@ const StrukturOrganisasi = ({ isVisible }) => {
                 <div className="w-16 h-16 bg-[#5c0b08] rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Users className="w-8 h-8 text-white" />
                 </div>
-                <p className="text-3xl font-bold text-[#5c0b08] mb-1">85</p>
+                <p className="text-3xl font-bold text-[#5c0b08] mb-1">{Object.keys(putra).length + Object.keys(putri).length}</p>
                 <p className="text-gray-600 font-medium">Total Pengurus</p>
               </motion.div>
 
@@ -358,7 +358,7 @@ const StrukturOrganisasi = ({ isVisible }) => {
                 <div className="w-16 h-16 bg-[#903d04] rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Crown className="w-8 h-8 text-white" />
                 </div>
-                <p className="text-3xl font-bold text-[#903d04] mb-1">41</p>
+                <p className="text-3xl font-bold text-[#903d04] mb-1">{Object.keys(putra).length}</p>
                 <p className="text-gray-600 font-medium">Pengurus Putra</p>
               </motion.div>
 
@@ -366,7 +366,7 @@ const StrukturOrganisasi = ({ isVisible }) => {
                 <div className="w-16 h-16 bg-[#f9ba02] rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <Star className="w-8 h-8 text-white" />
                 </div>
-                <p className="text-3xl font-bold text-[#f9ba02] mb-1">44</p>
+                <p className="text-3xl font-bold text-[#f9ba02] mb-1">{Object.keys(putri).length}</p>
                 <p className="text-gray-600 font-medium">Pengurus Putri</p>
               </motion.div>
             </div>

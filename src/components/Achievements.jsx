@@ -32,6 +32,7 @@ const AchievementCard = ({ achievement, index, onClick }) => {
             <img
               src={imageUrl}
               alt={achievement.title}
+              loading="lazy"
               className="w-full h-full object-cover rounded-full p-1"
               onError={(e) => {
                 e.target.style.display = "none";
@@ -92,6 +93,7 @@ const AchievementModal = ({ achievement, onClose }) => {
                 imageUrl || "https://via.placeholder.com/150?text=Achievement"
               }
               alt={achievement.title}
+              loading="lazy"
               className="w-full h-full object-cover rounded-full"
               onError={(e) => {
                 e.target.src =

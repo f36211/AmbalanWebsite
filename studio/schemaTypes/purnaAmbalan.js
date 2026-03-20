@@ -12,8 +12,18 @@ export default {
     {
       name: 'year',
       title: 'Year/Angkatan',
-      type: 'string', // Kept as string to allow "2023/2024" format if needed
-      validation: (Rule) => Rule.required(),
+      type: 'string',
+      validation: (Rule) =>
+        Rule.required().custom(async (year, context) => {
+          if (!year) return true;
+          const { document, getClient } = context;
+          const client = getClient({ apiVersion: '2023-10-01' });
+          const id = document._id.replace(/^drafts\./, '');
+          const params = { year, id };
+          const query = `count(*[_type == "purnaAmbalan" && year == $year && !(_id in [$id, "drafts." + $id])])`;
+          const count = await client.fetch(query, params);
+          return count === 0 || `Purna Ambalan tahun "${year}" sudah ada. Duplikat tidak diperbolehkan.`;
+        }),
     },
     {
       name: 'date',

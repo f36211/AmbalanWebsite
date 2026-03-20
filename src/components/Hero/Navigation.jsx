@@ -165,6 +165,8 @@ const Navigation = ({ isPageLoading, isInitialLoad = false, isScrolled = false, 
         >
           <button
             onClick={toggleCompactNav}
+            aria-expanded={showCompactNav}
+            aria-label={showCompactNav ? "Tutup menu navigasi" : "Buka menu navigasi"}
             className="w-12 h-12 bg-black/20 backdrop-blur-md rounded-full flex items-center justify-center text-white hover:bg-black/30 transition-all duration-300 border border-white/20 shadow-lg"
           >
             <motion.div
@@ -318,6 +320,7 @@ const Navigation = ({ isPageLoading, isInitialLoad = false, isScrolled = false, 
       </AnimatePresence>
 
       <motion.nav
+        aria-label="Navigasi utama"
         className="fixed w-full top-0 z-50"
         variants={topDownVariants}
         initial="hidden"
@@ -485,6 +488,8 @@ const Navigation = ({ isPageLoading, isInitialLoad = false, isScrolled = false, 
 
               <motion.button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
+                aria-expanded={isMenuOpen}
+                aria-label={isMenuOpen ? "Tutup menu" : "Buka menu"}
                 className={`md:hidden p-2 sm:p-3 rounded-xl transition-all duration-300 ${
                   isScrolled || !isHomePage || isModalOpen
                     ? "text-[#5c0b08] hover:text-white hover:bg-gradient-to-r hover:from-[#903d04] hover:to-[#5c0b08]"

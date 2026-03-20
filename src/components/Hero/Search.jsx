@@ -48,7 +48,7 @@ const Search = () => {
                 href={result.url}
                 className="flex items-center p-2 text-[#5c0b08] hover:bg-gradient-to-r hover:from-[#903d04] hover:to-[#5c0b08] hover:text-white rounded-lg transition-all duration-200"
               >
-                <img src={result.imageUrl} alt={result.title} className="w-12 h-12 object-cover rounded-md mr-4" />
+                <img src={result.imageUrl} alt={result.title} loading="lazy" className="w-12 h-12 object-cover rounded-md mr-4" />
                 <div>
                   <div className="font-semibold">{result.title}</div>
                   <div className="text-sm text-gray-500">{result.description}</div>

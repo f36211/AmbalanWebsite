@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 export default function Filosofi({ isVisible = {} }) {
   // Data for the explanation cards
   const putraData = {
-    logo: "images/logo/L2.png",
+    logo: "/images/logo/L2.png",
     name: "SHALAHUDIN AL AYUBI",
     explanation: [
       "Lambang yang berbentuk perisai berarti seorang penegak harus mempunyai perisai diri untuk mempertahankan dirinya dari godaan-godaan atau ajakan-ajakan dari hal-hal yang tidak baik.",
@@ -19,7 +19,7 @@ export default function Filosofi({ isVisible = {} }) {
   };
 
   const putriData = {
-    logo: "images/logo/L3.png",
+    logo: "/images/logo/L3.png",
     name: "FATHIMAH AZ ZAHRA",
     explanation: [
       "Siluet Fatimah Az Zahra melambangkan seorang penegak putri harus selalu menjaga dirinya sebagai seorang muslimah dengan menutup auratnya.",
@@ -58,7 +58,8 @@ export default function Filosofi({ isVisible = {} }) {
           >
             <img 
               src="/images/landing/svgs/putra.svg" 
-              alt="Filosofi Logo Amabalan Putra" 
+              alt="Filosofi Logo Ambalan Putra" 
+              loading="lazy"
               className="w-full h-auto max-h-[65vh] object-contain"
             />
           </motion.div>
@@ -74,7 +75,7 @@ export default function Filosofi({ isVisible = {} }) {
               <h1 className="text-2xl font-bold text-gray-800 text-center mb-4">Filosofi Logo Ambalan</h1>
               <div className="bg-white rounded-2xl shadow-xl p-6">
                 <div className="text-center mb-4">
-                  <img src={putraData.logo} alt="Logo Putra" className="w-24 h-24 mx-auto mb-4"/>
+                  <img src={putraData.logo} alt="Logo Putra" loading="lazy" className="w-24 h-24 mx-auto mb-4"/>
                   <h2 className="text-xl font-bold text-gray-800">SHALAHUDIN AL AYUBI</h2>
                 </div>
                 <ul className="space-y-3 text-gray-600 text-sm">
@@ -114,7 +115,8 @@ export default function Filosofi({ isVisible = {} }) {
           >
             <img 
               src="/images/landing/svgs/putri.svg" 
-              alt="Filosofi Logo Amabalan Putri" 
+              alt="Filosofi Logo Ambalan Putri" 
+              loading="lazy"
               className="w-full h-auto max-h-[65vh] object-contain"
             />
           </motion.div>
@@ -129,7 +131,7 @@ export default function Filosofi({ isVisible = {} }) {
             transition={{ duration: 0.5 }}
            >
               <div className="text-center mb-4">
-                <img src={putriData.logo} alt="Logo Putri" className="w-24 h-24 mx-auto mb-4"/>
+                <img src={putriData.logo} alt="Logo Putri" loading="lazy" className="w-24 h-24 mx-auto mb-4"/>
                 <h2 className="text-xl font-bold text-gray-800">{putriData.name}</h2>
               </div>
               <ul className="space-y-3 text-gray-600 text-sm">

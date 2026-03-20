@@ -238,7 +238,7 @@ export const stats = [
 
 // Hero section data
 export const heroData = {
-  title: "AMBALANSS",
+  title: "AMBALAN",
   subtitle: "SMAIT UMMUL QURO BOGOR",
   motto: "Satyaku Kudarmakan, Darmaku Kubaktikan",
   logos: {

@@ -7,7 +7,17 @@ export default {
       name: 'title',
       title: 'Title',
       type: 'string',
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.required().custom(async (title, context) => {
+          if (!title) return true;
+          const { document, getClient } = context;
+          const client = getClient({ apiVersion: '2023-10-01' });
+          const id = document._id.replace(/^drafts\./, '');
+          const params = { title, id };
+          const query = `count(*[_type == "achievement" && title == $title && !(_id in [$id, "drafts." + $id])])`;
+          const count = await client.fetch(query, params);
+          return count === 0 || `Achievement "${title}" sudah ada. Periksa apakah ini duplikat.`;
+        }),
     },
     {
       name: 'year',
@@ -30,7 +40,7 @@ export default {
       },
     },
     {
-      name: 'badgeUrl', // Legacy field support if needed, or we just map badgeImage to url
+      name: 'badgeUrl',
       title: 'External Badge URL (Optional)',
       type: 'url',
       description: 'Use if you have a direct link instead of uploading an image.',
