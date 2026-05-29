@@ -1,33 +1,92 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   motion,
   AnimatePresence,
   useScroll,
   useTransform,
 } from "framer-motion";
-import { Instagram, Youtube, Music2 } from "lucide-react";
+import { Instagram, Youtube, Music2, BookOpen, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useWindowSize } from "../../hooks/useWindowSize";
 
-// Floating particles component
-const FloatingParticles = () => {
-  // Responsive particle count based on screen size and performance
-  const [particleCount, setParticleCount] = useState(20);
-  
-  useEffect(() => {
-    const updateParticleCount = () => {
-      const width = window.innerWidth;
-      if (width < 480) setParticleCount(8);
-      else if (width < 768) setParticleCount(12);
-      else if (width < 1024) setParticleCount(16);
-      else setParticleCount(20);
-    };
+// ─── Static animation variants (moved outside to prevent re-creation) ──────
 
-    updateParticleCount();
-    window.addEventListener('resize', updateParticleCount);
-    return () => window.removeEventListener('resize', updateParticleCount);
-  }, []);
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.3,
+    },
+  },
+};
 
-  const [particles] = useState(() =>
-    Array.from({ length: particleCount }, (_, i) => i)
+const itemVariants = {
+  hidden: { y: 60, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      damping: 25,
+      stiffness: 120,
+    },
+  },
+};
+
+const logoVariants = {
+  hidden: { scale: 0, rotate: -180, opacity: 0 },
+  visible: {
+    scale: 1,
+    rotate: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      damping: 20,
+      stiffness: 300,
+      delay: 0.6,
+    },
+  },
+};
+
+const textVariants = {
+  hidden: { scale: 0.3, opacity: 0, rotateX: 90 },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    rotateX: 0,
+    transition: {
+      type: "spring",
+      damping: 25,
+      stiffness: 150,
+      delay: 0.9,
+    },
+  },
+};
+
+const groupVariants = {
+  hidden: { y: 120, opacity: 0, scale: 0.7 },
+  visible: { 
+    y: 0, 
+    opacity: 1, 
+    scale: 1,
+    transition: {
+      type: "spring",
+      damping: 30,
+      stiffness: 100,
+      delay: 1.3,
+    }
+  },
+};
+
+// ─── Floating particles component ──────────────────────────────────────────────
+
+const FloatingParticles = ({ particleCount }) => {
+  // useMemo so particle array re-creates when count changes
+  const particles = useMemo(
+    () => Array.from({ length: particleCount }, (_, i) => i),
+    [particleCount]
   );
 
   return (
@@ -59,7 +118,8 @@ const FloatingParticles = () => {
   );
 };
 
-// Full Page Modal Component with animation starting from the clicked logo
+// ─── Full Page Modal Component ─────────────────────────────────────────────────
+
 const LogoModal = ({ isOpen, onClose, logoData, clickedLogoType }) => {
   return (
     <AnimatePresence>
@@ -70,15 +130,15 @@ const LogoModal = ({ isOpen, onClose, logoData, clickedLogoType }) => {
             initial={{
               clipPath:
                 clickedLogoType === "putra"
-                  ? "circle(0% at 10% 50%)" // Start from far left logo position (L2 is putra)
-                  : "circle(0% at 90% 50%)", // Start from far right logo position (L3 is putri)
+                  ? "circle(0% at 10% 50%)"
+                  : "circle(0% at 90% 50%)",
             }}
             animate={{ clipPath: "circle(150% at 50% 50%)" }}
             exit={{
               clipPath:
                 clickedLogoType === "putra"
-                  ? "circle(0% at 10% 50%)" // Return to far left logo position (L2 is putra)
-                  : "circle(0% at 90% 50%)", // Return to far right logo position (L3 is putri)
+                  ? "circle(0% at 10% 50%)"
+                  : "circle(0% at 90% 50%)",
             }}
             transition={{
               duration: 0.8,
@@ -102,24 +162,12 @@ const LogoModal = ({ isOpen, onClose, logoData, clickedLogoType }) => {
   );
 };
 
-// Animated Background Layers Component
-const AnimatedBackground = ({ backgroundOpacity }) => {
+// ─── Animated Background Layers Component ──────────────────────────────────────
+
+const AnimatedBackground = ({ backgroundOpacity, isMobile }) => {
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.4]);
-
-  // Disable parallax on mobile for better performance
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   const effectiveY = isMobile ? "0%" : y;
   const effectiveOpacity = isMobile ? 1 : opacity;
@@ -140,10 +188,11 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
           style={{ backgroundImage: `url("/images/landing/background.webp")` }}
         />
 
-        {/* Center lights - RESPONSIVE POSITIONING: Always centered, behind group */}
+        {/* Center lights */}
         <motion.img
           src="/images/landing/centerlight.webp"
           alt="center light"
+          loading="lazy"
           className="absolute bottom-8 xs:bottom-12 sm:bottom-16 md:bottom-20 lg:bottom-24 xl:bottom-32 2xl:bottom-40 left-1/2 -translate-x-1/2 z-20 w-48 xs:w-56 sm:w-64 md:w-80 lg:w-96 xl:w-[28rem] 2xl:w-[32rem] h-auto"
           animate={{
             scale: [1, 1.08, 1],
@@ -160,6 +209,7 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
         <motion.img
           src="/images/landing/centerlight2.webp"
           alt="center light 2"
+          loading="lazy"
           className="absolute bottom-8 xs:bottom-12 sm:bottom-16 md:bottom-20 lg:bottom-24 xl:bottom-32 2xl:bottom-40 left-1/2 -translate-x-1/2 z-20 w-48 xs:w-56 sm:w-64 md:w-80 lg:w-96 xl:w-[28rem] 2xl:w-[32rem] h-auto"
           animate={{
             scale: [1.08, 1, 1.08],
@@ -173,7 +223,7 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
           }}
         />
 
-        {/* Red background overlay with improved animation */}
+        {/* Red background overlay */}
         <motion.div
           className="absolute inset-0 bg-center bg-no-repeat bg-cover"
           style={{ backgroundImage: `url("/images/landing/redbg.webp")` }}
@@ -188,10 +238,11 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
           }}
         />
 
-        {/* Side lights with gentle sway and improved responsiveness */}
+        {/* Side lights */}
         <motion.img
           src="/images/landing/anotherlight.webp"
           alt="left light"
+          loading="lazy"
           className="absolute left-0 top-0 h-full w-auto object-cover"
           animate={{ 
             opacity: [0.6, 0.4, 0.7],
@@ -207,6 +258,7 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
         <motion.img
           src="/images/landing/anotherlight2.webp"
           alt="right light"
+          loading="lazy"
           className="absolute right-0 top-0 h-full w-auto object-cover"
           animate={{ 
             opacity: [0.6, 0.4, 0.7],
@@ -224,33 +276,59 @@ const AnimatedBackground = ({ backgroundOpacity }) => {
   );
 };
 
-// The main Hero component
+// ─── Responsive class maps (static, outside component) ─────────────────────
+
+const ambalanTextClasses = {
+  xs: "w-full max-w-xs mb-4 scale-100",
+  sm: "w-full max-w-sm mb-6 scale-110",
+  md: "w-full max-w-md mb-8 scale-120",
+  lg: "w-full max-w-lg mb-10 scale-135",
+  xl: "w-full max-w-xl mb-12 scale-150",
+  "2xl": "w-full max-w-2xl mb-16 scale-150",
+};
+
+const groupPeopleClasses = {
+  xs: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg scale-120",
+  sm: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-xl scale-140",
+  md: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl scale-160",
+  lg: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl scale-180",
+  xl: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl scale-210",
+  "2xl": "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-5xl scale-135",
+};
+
+const logoDesktopClasses = {
+  lg: "w-32 h-32",
+  xl: "w-36 h-36",
+  "2xl": "w-40 h-40",
+};
+
+const logoMobileClasses = {
+  xs: "w-12 h-12",
+  sm: "w-14 h-14",
+  md: "w-16 h-16",
+};
+
+const hoverScaleMap = {
+  xs: 1.05,
+  sm: 1.08,
+  md: 1.10,
+  lg: 1.12,
+  xl: 1.15,
+  "2xl": 1.15,
+};
+
+// ─── The main Hero component ───────────────────────────────────────────────────
+
 const Hero = ({ onModalStateChange }) => {
   const [backgroundOpacity, setBackgroundOpacity] = useState(0);
   const [activeModal, setActiveModal] = useState(null);
   const [clickedLogoType, setClickedLogoType] = useState(null);
   const containerRef = useRef(null);
-  const [screenSize, setScreenSize] = useState('lg');
-
-  // Track screen size for responsive adjustments
-  useEffect(() => {
-    const updateScreenSize = () => {
-      const width = window.innerWidth;
-      if (width < 480) setScreenSize('xs');
-      else if (width < 640) setScreenSize('sm');
-      else if (width < 768) setScreenSize('md');
-      else if (width < 1024) setScreenSize('lg');
-      else if (width < 1280) setScreenSize('xl');
-      else setScreenSize('2xl');
-    };
-
-    updateScreenSize();
-    window.addEventListener('resize', updateScreenSize);
-    return () => window.removeEventListener('resize', updateScreenSize);
-  }, []);
+  
+  // Single shared hook replaces 3 separate resize listeners
+  const { screenSize, isMobile, particleCount } = useWindowSize();
 
   useEffect(() => {
-    // Set background opacity after a short delay to allow for fade-in effect
     const timer = setTimeout(() => setBackgroundOpacity(100), 100);
     return () => clearTimeout(timer);
   }, []);
@@ -291,7 +369,6 @@ const Hero = ({ onModalStateChange }) => {
     }
   }, [activeModal, onModalStateChange]);
 
-  // Ensure modal state changes are properly communicated
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === 'Escape' && activeModal) {
@@ -322,125 +399,18 @@ const Hero = ({ onModalStateChange }) => {
     };
   }, [activeModal]);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 60, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        damping: 25,
-        stiffness: 120,
-      },
-    },
-  };
-
-  const logoVariants = {
-    hidden: { scale: 0, rotate: -180, opacity: 0 },
-    visible: {
-      scale: 1,
-      rotate: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        damping: 20,
-        stiffness: 300,
-        delay: 0.6,
-      },
-    },
-  };
-
-  const textVariants = {
-    hidden: { scale: 0.3, opacity: 0, rotateX: 90 },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      rotateX: 0,
-      transition: {
-        type: "spring",
-        damping: 25,
-        stiffness: 150,
-        delay: 0.9,
-      },
-    },
-  };
-
-  const groupVariants = {
-    hidden: { y: 120, opacity: 0, scale: 0.7 },
-    visible: { 
-      y: 0, 
-      opacity: 1, 
-      scale: 1,
-      transition: {
-        type: "spring",
-        damping: 30,
-        stiffness: 100,
-        delay: 1.3,
-      }
-    },
-  };
-
-
-
-  // Get responsive classes based on screen size
-  const getResponsiveClasses = () => {
-    const classes = {
-      container: "relative min-h-screen flex items-center justify-center overflow-hidden bg-black",
-      ambalanText: {
-        xs: "w-full max-w-xs mb-4 scale-100",
-        sm: "w-full max-w-sm mb-6 scale-110",
-        md: "w-full max-w-md mb-8 scale-120",
-        lg: "w-full max-w-lg mb-10 scale-135",
-        xl: "w-full max-w-xl mb-12 scale-150",
-        "2xl": "w-full max-w-2xl mb-16 scale-150"
-      },
-      groupPeople: {
-        xs: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg scale-120",
-        sm: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-xl scale-140",
-        md: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-2xl scale-160",
-        lg: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl scale-180",
-        xl: "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-4xl scale-210",
-        "2xl": "bottom-0 left-1/2 -translate-x-1/2 w-full max-w-5xl scale-135"
-      },
-      logoDesktop: {
-        lg: "w-32 h-32",
-        xl: "w-36 h-36",
-        "2xl": "w-40 h-40"
-      },
-      logoMobile: {
-        xs: "w-12 h-12",
-        sm: "w-14 h-14",
-        md: "w-16 h-16"
-      }
-    };
-    return classes;
-  };
-
-  const classes = getResponsiveClasses();
-
   return (
     <motion.section
       ref={containerRef}
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className={`${classes.container} pt-16 sm:pt-20 md:pt-24`}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black pt-16 sm:pt-20 md:pt-24"
     >
-      <FloatingParticles />
-      <AnimatedBackground backgroundOpacity={backgroundOpacity} />
+      <FloatingParticles particleCount={particleCount} />
+      <AnimatedBackground backgroundOpacity={backgroundOpacity} isMobile={isMobile} />
 
-      {/* Bottom paper - positioned above center lights with improved animation */}
+      {/* Bottom paper */}
       <motion.img
         src="/images/landing/kertasbawah.webp"
         alt="bottom paper"
@@ -455,27 +425,27 @@ const Hero = ({ onModalStateChange }) => {
         }}
       />
 
-      {/* Group of people - BIGGER and more responsive */}
+      {/* Group of people */}
       <motion.img
         src="/images/landing/Groupsorang.webp"
         alt="group of people"
-        className={`absolute ${classes.groupPeople[screenSize]} z-40 object-contain`}
+        className={`absolute ${groupPeopleClasses[screenSize]} z-40 object-contain`}
         variants={groupVariants}
         style={{
           filter: "drop-shadow(0 12px 25px rgba(0, 0, 0, 0.4))",
         }}
       />
 
-      {/* Desktop and Tablet Logo positioning with improved hover effects */}
+      {/* Desktop Logo positioning */}
       <motion.div
         variants={itemVariants}
         className="absolute inset-x-0 top-1/2 -translate-y-1/2 z-[80] hidden lg:block"
       >
         <div className="flex justify-between items-center w-full relative px-8 lg:px-12 xl:px-16 2xl:px-20">
           <motion.img
-            src="/images/logo/L2.png"
+            src="/images/logo/L2.webp"
             alt="Scout Logo Putra"
-            className={`${classes.logoDesktop[screenSize] || classes.logoDesktop.lg} drop-shadow-2xl cursor-pointer relative`}
+            className={`${logoDesktopClasses[screenSize] || logoDesktopClasses.lg} drop-shadow-2xl cursor-pointer relative`}
             variants={logoVariants}
             animate={{
               opacity: activeModal === "putra" ? 1 : activeModal ? 0.3 : 1,
@@ -525,9 +495,9 @@ const Hero = ({ onModalStateChange }) => {
           />
 
           <motion.img
-            src="/images/logo/L3.png"
+            src="/images/logo/L3.webp"
             alt="Scout Logo Putri"
-            className={`${classes.logoDesktop[screenSize] || classes.logoDesktop.lg} drop-shadow-2xl cursor-pointer relative`}
+            className={`${logoDesktopClasses[screenSize] || logoDesktopClasses.lg} drop-shadow-2xl cursor-pointer relative`}
             variants={logoVariants}
             animate={{
               opacity: activeModal === "putri" ? 1 : activeModal ? 0.3 : 1,
@@ -578,7 +548,7 @@ const Hero = ({ onModalStateChange }) => {
         </div>
       </motion.div>
 
-      {/* Main content with improved responsive positioning */}
+      {/* Main content */}
       <AnimatePresence>
         {!activeModal && (
           <motion.div
@@ -593,18 +563,14 @@ const Hero = ({ onModalStateChange }) => {
               variants={itemVariants}
               className="flex flex-col items-center justify-center relative bottom-4 xs:bottom-8 sm:bottom-16 md:bottom-24 lg:bottom-32 xl:bottom-40 2xl:bottom-48"
             >
-              {/* Ambalan Text - Responsive with subtle hover */}
+              {/* Ambalan Text */}
               <motion.img
                 src="/images/landing/ambalantext.png"
                 alt="Ambalan Text"
-                className={`${classes.ambalanText[screenSize]} z-50`}
+                className={`${ambalanTextClasses[screenSize]} z-50`}
                 variants={textVariants}
                 whileHover={{
-                  scale: screenSize === 'xs' ? 1.05 : 
-                        screenSize === 'sm' ? 1.08 :
-                        screenSize === 'md' ? 1.10 :
-                        screenSize === 'lg' ? 1.12 :
-                        screenSize === 'xl' ? 1.15 : 1.15,
+                  scale: hoverScaleMap[screenSize] || 1.15,
                   transition: { 
                     duration: 0.3,
                     type: "spring",
@@ -616,15 +582,15 @@ const Hero = ({ onModalStateChange }) => {
                 }}
               />
 
-              {/* Mobile logo layout with improved spacing */}
+              {/* Mobile logo layout */}
               <motion.div
                 className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8 mt-4 sm:mt-6 md:mt-8 lg:hidden"
                 variants={itemVariants}
               >
                 <motion.img
-                  src="/images/logo/L2.png"
+                  src="/images/logo/L2.webp"
                   alt="Scout Logo Putra"
-                  className={`${classes.logoMobile[screenSize]} drop-shadow-lg`}
+                  className={`${logoMobileClasses[screenSize]} drop-shadow-lg`}
                   variants={logoVariants}
                   whileHover={{ 
                     scale: 1.15, 
@@ -641,9 +607,9 @@ const Hero = ({ onModalStateChange }) => {
                   }}
                 />
                 <motion.img
-                  src="/images/logo/L3.png"
+                  src="/images/logo/L3.webp"
                   alt="Scout Logo Putri"
-                  className={`${classes.logoMobile[screenSize]} drop-shadow-lg`}
+                  className={`${logoMobileClasses[screenSize]} drop-shadow-lg`}
                   variants={logoVariants}
                   whileHover={{ 
                     scale: 1.15, 
@@ -662,11 +628,12 @@ const Hero = ({ onModalStateChange }) => {
               </motion.div>
             </motion.div>
 
-            {/* Corner lights - improved animations and responsive visibility */}
+            {/* Corner lights - desktop only, lazy loaded */}
             <>
               <motion.img
                 src="/images/landing/Cahaya2.png"
                 alt="Cahaya2 top left light"
+                loading="lazy"
                 className="absolute left-0 top-0 w-1/4 lg:w-1/3 xl:w-1/4 2xl:w-1/5 z-30 pointer-events-none opacity-70 sm:opacity-80 lg:opacity-90 hidden lg:block"
                 initial={{ opacity: 0, x: -50, rotate: -10 }}
                 animate={{ 
@@ -689,6 +656,7 @@ const Hero = ({ onModalStateChange }) => {
               <motion.img
                 src="/images/landing/Cahaya1.png"
                 alt="Cahaya1 top right light"
+                loading="lazy"
                 className="absolute right-0 top-0 w-1/4 lg:w-1/3 xl:w-1/4 2xl:w-1/5 z-30 pointer-events-none opacity-70 sm:opacity-80 lg:opacity-90 hidden lg:block"
                 initial={{ opacity: 0, x: 50, rotate: 10 }}
                 animate={{ 

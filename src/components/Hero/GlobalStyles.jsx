@@ -2,7 +2,7 @@ import React from 'react';
 
 const GlobalStyles = () => {
   return (
-    <style jsx global>{`
+    <style>{`
       .animate-spin-slow {
         animation: spin 8s linear infinite;
       }

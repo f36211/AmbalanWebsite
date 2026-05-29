@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BrowserRouter as Router,
@@ -14,111 +14,47 @@ import LeadershipHistory from "./components/Hero/LeadershipHistory";
 import Footer from "./components/Hero/Footer";
 import GlobalStyles from "./components/Hero/GlobalStyles";
 import Breadcrumb from "./components/ui/Breadcrumb";
-import AdminApp from "./components/admin/AdminApp";
-import Filosofi from "./components/filosofi.jsx";
-import Achievements from "./components/Achievements.jsx";
 import LoadingScreen from "./components/ui/LoadingScreen.jsx";
+import MateriPreview from "./components/MateriPreview";
 
-// Import all components from components folder
-import TentangKami from "./components/TentangKami";
-import StrukturOrganisasi from "./components/StrukturOrganisasi";
-import FotoKegiatan from "./components/FotoKegiatan";
-import FotoPurnaAmbalan from "./components/FotoPurnaAmbalan";
-import SeragamPramuka from "./components/SeragamPramuka";
-import MateriPramuka from "./components/MateriPramuka";
+// Lazy-loaded route components (code splitting)
+const TentangKami = React.lazy(() => import("./components/TentangKami"));
+const StrukturOrganisasi = React.lazy(() => import("./components/StrukturOrganisasi"));
+const FotoKegiatan = React.lazy(() => import("./components/FotoKegiatan"));
+const FotoPurnaAmbalan = React.lazy(() => import("./components/FotoPurnaAmbalan"));
+const SeragamPramuka = React.lazy(() => import("./components/SeragamPramuka"));
+const MateriPramuka = React.lazy(() => import("./components/MateriPramuka"));
+const SejarahPramuka = React.lazy(() => import("./components/SejarahPramuka"));
+const SimpulIkatan = React.lazy(() => import("./components/SimpulIkatan"));
+const SandiPramuka = React.lazy(() => import("./components/SandiPramuka"));
+const Peta = React.lazy(() => import("./components/Peta"));
+const TokohPramuka = React.lazy(() => import("./components/TokohPramuka"));
+const FaktaJambore = React.lazy(() => import("./components/FaktaJambore"));
+const AdminApp = React.lazy(() => import("./components/admin/AdminApp"));
+const Filosofi = React.lazy(() => import("./components/filosofi.jsx"));
+const Achievements = React.lazy(() => import("./components/Achievements.jsx"));
 
-// Route-specific visibility hook
-const useRouteVisibility = () => {
-  const [isVisible, setIsVisible] = useState({});
-  const [isScrolled, setIsScrolled] = useState(false);
-  const observerRef = useRef(null);
-  const location = useLocation();
+// ─── Static animation variants (moved outside components to prevent re-creation) ──
 
-  useEffect(() => {
-    // Clear previous visibility state when route changes
-    setIsVisible({});
-    setIsScrolled(window.scrollY > 50);
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  in: { opacity: 1, y: 0 },
+  out: { opacity: 0, y: -20 },
+};
 
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    // Create new intersection observer for each route
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
-
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        const newVisibility = {};
-        entries.forEach((entry) => {
-          if (entry.target.id) {
-            newVisibility[entry.target.id] = entry.isIntersecting;
-          }
-        });
-
-        if (Object.keys(newVisibility).length > 0) {
-          setIsVisible((prev) => ({ ...prev, ...newVisibility }));
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: "50px 0px -50px 0px",
-      },
-    );
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    // Function to observe elements with retry mechanism
-    const observeElements = (attempts = 0) => {
-      if (attempts >= 10) return; // Max 10 attempts
-
-      const elements = document.querySelectorAll("[data-animate]");
-      if (elements.length > 0) {
-        // Set initial visibility for elements already in viewport
-        const initialVisibility = {};
-        elements.forEach((el) => {
-          if (el.id && observerRef.current) {
-            const rect = el.getBoundingClientRect();
-            const isInViewport =
-              rect.top < window.innerHeight && rect.bottom > 0;
-            initialVisibility[el.id] = isInViewport;
-            observerRef.current.observe(el);
-          }
-        });
-
-        if (Object.keys(initialVisibility).length > 0) {
-          setIsVisible((prev) => ({ ...prev, ...initialVisibility }));
-        }
-      } else {
-        // Retry after a short delay if elements not found
-        setTimeout(() => observeElements(attempts + 1), 100);
-      }
-    };
-
-    // Start observing after a short delay to ensure DOM is ready
-    const timeoutId = setTimeout(() => observeElements(), 100);
-
-    return () => {
-      clearTimeout(timeoutId);
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [location.pathname]); // Re-run when route changes
-
-  return { isVisible, isScrolled };
+const pageTransition = {
+  type: "tween",
+  ease: "anticipate",
+  duration: 0.5,
 };
 
 // Home component that contains all the sections from the original single-page layout
-const Home = ({ onModalStateChange }) => {
-  const { isVisible } = useRouteVisibility();
-
+const Home = ({ isVisible, onModalStateChange }) => {
   return (
     <div className="relative">
       <Hero isVisible={isVisible} onModalStateChange={onModalStateChange} />
       <TentangKami isVisible={isVisible} />
+      <MateriPreview isVisible={isVisible} />
       <LeadershipHistory isVisible={isVisible} />
     </div>
   );
@@ -157,7 +93,6 @@ const ScrollToTop = () => {
 
 // Enhanced route component with proper visibility handling
 const RouteComponent = ({ Component, isFullSize = false }) => {
-  const { isVisible } = useRouteVisibility();
   const [showContent, setShowContent] = useState(false);
   const [enhancedVisibility, setEnhancedVisibility] = useState({});
 
@@ -176,32 +111,11 @@ const RouteComponent = ({ Component, isFullSize = false }) => {
     const newVisibility = {};
     elements.forEach((el) => {
       if (el.id) {
-        newVisibility[el.id] = showContent || isVisible[el.id] === true;
+        newVisibility[el.id] = showContent;
       }
     });
     setEnhancedVisibility(newVisibility);
-  }, [showContent, isVisible]);
-
-  const pageVariants = {
-    initial: {
-      opacity: 0,
-      y: 20,
-    },
-    in: {
-      opacity: 1,
-      y: 0,
-    },
-    out: {
-      opacity: 0,
-      y: -20,
-    },
-  };
-
-  const pageTransition = {
-    type: "tween",
-    ease: "anticipate",
-    duration: 0.5,
-  };
+  }, [showContent]);
 
   const WrapperComponent = isFullSize ? FullSizeWrapper : PageWrapper;
 
@@ -345,14 +259,30 @@ const routeTitles = {
   "/foto-purna-ambalan": "Foto Purna Ambalan | Ambalan SMAIT Ummul Quro",
   "/seragam": "Seragam Pramuka | Ambalan SMAIT Ummul Quro",
   "/materi-pramuka": "Materi Pramuka | Ambalan SMAIT Ummul Quro",
+  "/sejarah-pramuka": "Sejarah Pramuka | Ambalan SMAIT Ummul Quro",
+  "/simpul-ikatan": "Simpul & Ikatan | Ambalan SMAIT Ummul Quro",
+  "/sandi-pramuka": "Sandi Pramuka | Ambalan SMAIT Ummul Quro",
+  "/peta": "Peta | Ambalan SMAIT Ummul Quro",
+  "/tokoh-pramuka": "Tokoh Pramuka | Ambalan SMAIT Ummul Quro",
+  "/fakta-jambore": "Fakta Jambore | Ambalan SMAIT Ummul Quro",
   "/struktur-organisasi": "Struktur Organisasi | Ambalan SMAIT Ummul Quro",
   "/filosofi": "Filosofi Logo | Ambalan SMAIT Ummul Quro",
   "/achievements": "Prestasi | Ambalan SMAIT Ummul Quro",
   "/admin": "Admin Panel | Ambalan SMAIT Ummul Quro",
 };
 
+// Suspense fallback for lazy-loaded route components
+const RouteFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="text-center">
+      <div className="w-8 h-8 border-4 border-[#903d04] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p className="text-sm text-gray-500 font-medium">Memuat halaman...</p>
+    </div>
+  </div>
+);
+
 const AppContent = () => {
-  const { isScrolled } = useScrollAndAnimation();
+  const { isVisible, isScrolled } = useScrollAndAnimation();
   const location = useLocation();
 
   // MODAL STATE MANAGEMENT
@@ -437,89 +367,115 @@ const AppContent = () => {
       {/* Main Content Area with Routes */}
       <main id="main-content" className={`relative z-10`}>
         <ErrorBoundary>
-          <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-              {/* HOME ROUTE WITH MODAL STATE HANDLER */}
-              <Route
-                path="/"
-                element={<Home onModalStateChange={handleModalStateChange} />}
-              />
+          <Suspense fallback={<RouteFallback />}>
+            <AnimatePresence mode="wait">
+              <Routes location={location} key={location.pathname}>
+                {/* HOME ROUTE WITH MODAL STATE HANDLER */}
+                <Route
+                  path="/"
+                  element={<Home isVisible={isVisible} onModalStateChange={handleModalStateChange} />}
+                />
 
-              {/* Regular routes with PageWrapper */}
-              <Route
-                path="/tentang-kami"
-                element={<RouteComponent Component={TentangKami} />}
-              />
-              <Route
-                path="/foto-kegiatan"
-                element={<RouteComponent Component={FotoKegiatan} />}
-              />
-              <Route
-                path="/foto-purna-ambalan"
-                element={<RouteComponent Component={FotoPurnaAmbalan} />}
-              />
-              <Route
-                path="/seragam"
-                element={<RouteComponent Component={SeragamPramuka} />}
-              />
-              <Route
-                path="/materi-pramuka"
-                element={
-                  <RouteComponent Component={MateriPramuka} isFullSize={true} />
-                }
-              />
-              <Route
-                path="/admin"
-                element={<RouteComponent Component={AdminApp} />}
-              />
+                {/* Regular routes with PageWrapper */}
+                <Route
+                  path="/tentang-kami"
+                  element={<RouteComponent Component={TentangKami} />}
+                />
+                <Route
+                  path="/foto-kegiatan"
+                  element={<RouteComponent Component={FotoKegiatan} />}
+                />
+                <Route
+                  path="/foto-purna-ambalan"
+                  element={<RouteComponent Component={FotoPurnaAmbalan} />}
+                />
+                <Route
+                  path="/seragam"
+                  element={<RouteComponent Component={SeragamPramuka} />}
+                />
+                <Route
+                  path="/materi-pramuka"
+                  element={
+                    <RouteComponent Component={MateriPramuka} isFullSize={true} />
+                  }
+                />
+                <Route
+                  path="/sejarah-pramuka"
+                  element={<RouteComponent Component={SejarahPramuka} />}
+                />
+                <Route
+                  path="/simpul-ikatan"
+                  element={<RouteComponent Component={SimpulIkatan} />}
+                />
+                <Route
+                  path="/sandi-pramuka"
+                  element={<RouteComponent Component={SandiPramuka} />}
+                />
+                <Route
+                  path="/peta"
+                  element={<RouteComponent Component={Peta} />}
+                />
+                <Route
+                  path="/tokoh-pramuka"
+                  element={<RouteComponent Component={TokohPramuka} />}
+                />
+                <Route
+                  path="/fakta-jambore"
+                  element={<RouteComponent Component={FaktaJambore} />}
+                />
+                <Route
+                  path="/admin"
+                  element={<RouteComponent Component={AdminApp} />}
+                />
 
-              {/* Full-size routes (SVG, diagrams, charts, etc.) */}
-              <Route
-                path="/struktur-organisasi"
-                element={
-                  <RouteComponent
-                    Component={StrukturOrganisasi}
-                    isFullSize={true}
-                  />
-                }
-              />
-              <Route
-                path="/filosofi"
-                element={
-                  <RouteComponent Component={Filosofi} isFullSize={true} />
-                }
-              />
-              <Route
-                path="/achievements"
-                element={
-                  <RouteComponent Component={Achievements} isFullSize={true} />
-                }
-              />
+                {/* Full-size routes (SVG, diagrams, charts, etc.) */}
+                <Route
+                  path="/struktur-organisasi"
+                  element={
+                    <RouteComponent
+                      Component={StrukturOrganisasi}
+                      isFullSize={true}
+                    />
+                  }
+                />
+                <Route
+                  path="/filosofi"
+                  element={
+                    <RouteComponent Component={Filosofi} isFullSize={true} />
+                  }
+                />
+                <Route
+                  path="/achievements"
+                  element={
+                    <RouteComponent Component={Achievements} isFullSize={true} />
+                  }
+                />
 
-              {/* 404 Route */}
-              <Route
-                path="*"
-                element={
-                  <PageWrapper>
-                    <div className="text-center py-20">
-                      <h1 className="text-4xl font-bold text-gray-600 mb-4">
-                        404
-                      </h1>
-                      <p className="text-gray-500 mb-8">
-                        Halaman tidak ditemukan
-                      </p>
-                      <Link
-                        to="/"
-                        className="inline-block px-6 py-3 bg-gradient-to-r from-[#5c0b08] to-[#903d04] text-white rounded-lg hover:shadow-lg transition-all duration-300"
-                      >
-                        Kembali ke Beranda
-                      </Link>
-                    </div>
-                  </PageWrapper>
-                }
-              />
-            </Routes>
-          </AnimatePresence>
+                {/* 404 Route */}
+                <Route
+                  path="*"
+                  element={
+                    <PageWrapper>
+                      <div className="text-center py-20">
+                        <h1 className="text-4xl font-bold text-gray-600 mb-4">
+                          404
+                        </h1>
+                        <p className="text-gray-500 mb-8">
+                          Halaman tidak ditemukan
+                        </p>
+                        <Link
+                          to="/"
+                          className="inline-block px-6 py-3 bg-gradient-to-r from-[#5c0b08] to-[#903d04] text-white rounded-lg hover:shadow-lg transition-all duration-300"
+                        >
+                          Kembali ke Beranda
+                        </Link>
+                      </div>
+                    </PageWrapper>
+                  }
+                />
+              </Routes>
+            </AnimatePresence>
+          </Suspense>
         </ErrorBoundary>
       </main>
 

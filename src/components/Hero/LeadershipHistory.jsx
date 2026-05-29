@@ -140,7 +140,7 @@ const LeadershipHistory = ({ isVisible }) => {
   );
 };
 
-const TimelineCard = ({
+const TimelineCard = React.memo(({
   period,
   index,
   totalMembers,
@@ -212,6 +212,8 @@ const TimelineCard = ({
                 src={period.image}
                 alt={`Ambalan Periode ${period.year}`}
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
                 whileHover={{ scale: 1.1 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
                 onError={(e) => {
@@ -415,6 +417,8 @@ const TimelineCard = ({
       </motion.div>
     </div>
   );
-};
+});
+
+TimelineCard.displayName = 'TimelineCard';
 
 export default LeadershipHistory;

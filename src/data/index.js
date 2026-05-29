@@ -221,7 +221,7 @@ export const navigation = [
     children: ['Seragam Ambalan SMAIT Ummul Quro']
   },
   {
-    title: 'Materi Pramuka',
+    title: 'Materi',
     children: ['Materi Pembelajaran']
   },
   
